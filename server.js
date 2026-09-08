@@ -128,8 +128,17 @@ function resultPage(title, message, details = "", ltik = "") {
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}a{display:inline-block;margin-top:18px}</style></head><body><h1>${escapeHtml(title)}</h1><div>${message}</div>${details}<p><a href="${returnUrl}">返回测试选择</a></p></body></html>`;
 }
 
-function renderModeSelector(ltik) {
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TOEFL Junior List 1</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:auto;padding:24px;line-height:1.5}.card{border:1px solid #ddd;border-radius:12px;padding:18px;margin:14px 0}button{padding:12px 20px;font-size:16px;cursor:pointer}.muted{color:#666}.notice{background:#fff8df;border:1px solid #e6c85c;padding:12px;border-radius:8px}</style></head><body><h1>TOEFL Junior 词汇练习 · List 1</h1><p class="notice">请选择一种测试。每次测试独立评分，成绩会提交到 Canvas Gradebook。</p>${Object.entries(MODES).map(([mode, config]) => `<div class="card"><h2>${config.label} · ${config.count} 题</h2><p class="muted">${config.description}</p><form method="get" action="/quiz/start"><input type="hidden" name="mode" value="${mode}"><input type="hidden" name="ltik" value="${escapeHtml(ltik)}"><button type="submit">开始${config.label}</button></form></div>`).join("")}</body></html>`;
+function detectMode(idtoken, req) {
+  const text = [
+    idtoken?.platformContext?.resource?.title,
+    idtoken?.platformContext?.resource?.description,
+    req?.query?.assignment_name,
+    req?.query?.title
+  ].filter(Boolean).join(" ").toLowerCase();
+  if (text.includes("中译英") || text.includes("中文到英文") || text.includes("zh-to-en")) return "zhToEn";
+  if (text.includes("语境") || text.includes("context")) return "context";
+  if (text.includes("英译中") || text.includes("英文到中文") || text.includes("en-to-zh")) return "enToZh";
+  return null;
 }
 
 function renderQuiz(ltik, mode, questions) {
@@ -144,11 +153,13 @@ lti.app.use(express.json());
 lti.app.use(express.urlencoded({ extended: true }));
 lti.onUnregisteredPlatform((req, res) => res.status(400).send({ status: 400, error: "UNREGISTERED_PLATFORM" }));
 lti.onConnect((token, req, res) => lti.redirect(res, "/quiz"));
-lti.app.get("/quiz", (req, res) => res.send(renderModeSelector(res.locals.ltik || req.query.ltik || "")));
-lti.app.get("/quiz/start", (req, res) => {
-  const mode = req.query.mode;
-  res.send(renderQuiz(res.locals.ltik || req.query.ltik, mode, makeQuestions(mode)));
+lti.app.get("/quiz", (req, res) => {
+  const idtoken = res.locals.token;
+  const mode = detectMode(idtoken, req);
+  if (!mode) return res.status(400).send("无法识别当前 Canvas 作业对应的测试类型。请检查作业名称是否包含：英译中、中译英或语境题。" );
+  res.send(renderQuiz(res.locals.ltik || req.query.ltik || "", mode, makeQuestions(mode)));
 });
+lti.app.get("/quiz/start", (req, res) => res.redirect("/quiz"));
 
 lti.app.post("/submit-quiz", async (req, res) => {
   try {
