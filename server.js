@@ -45,18 +45,142 @@ lti.onUnregisteredPlatform((req, res) => {
   });
 });
 lti.onConnect((token, req, res) => {
+  return lti.redirect(res, "/grade-test");
+});
+// Gradebook test page
+lti.app.get("/grade-test", async (req, res) => {
+  const ltik = res.locals.ltik;
+
   return res.send(`
     <html>
       <head>
-        <title>Canvas LTI Test</title>
+        <title>Canvas Gradebook Test</title>
       </head>
-      <body>
-        <h1>Canvas LTI Test</h1>
-        <h2>LTI 1.3 launch successful!</h2>
-        <p>Hello, ${token.userInfo?.name || "Student"}!</p>
+      <body style="font-family: Arial, sans-serif; padding: 40px;">
+        <h1>Canvas Gradebook Test</h1>
+
+        <p>LTI 1.3 launch successful!</p>
+
+        <p>
+          This test will send a score of <strong>80/100</strong>
+          to the Canvas Gradebook.
+        </p>
+
+        <form method="POST" action="/grade-test?ltik=${encodeURIComponent(ltik)}">
+          <button
+            type="submit"
+            style="padding: 12px 24px; font-size: 16px;"
+          >
+            Submit 80/100 to Canvas
+          </button>
+        </form>
       </body>
     </html>
   `);
+});
+
+
+// Send test grade to Canvas
+lti.app.post("/grade-test", async (req, res) => {
+  try {
+    const idtoken = res.locals.token;
+
+    console.log("=== GRADE TEST ===");
+    console.log("User ID:", idtoken.user);
+    console.log("Platform:", idtoken.iss);
+    console.log(
+      "Line Item:",
+      idtoken.platformContext?.endpoint?.lineitem
+    );
+
+    let lineItemId =
+      idtoken.platformContext?.endpoint?.lineitem;
+
+    // If Canvas did not provide a line item,
+    // find the line item associated with this resource.
+    if (!lineItemId) {
+      const response = await lti.Grade.getLineItems(
+        idtoken,
+        { resourceLinkId: true }
+      );
+
+      const lineItems = response.lineItems || [];
+
+      if (lineItems.length === 0) {
+        console.log("No line item found. Creating one.");
+
+        const newLineItem = {
+          scoreMaximum: 100,
+          label: "LTI Grade Test",
+          tag: "grade-test",
+          resourceLinkId: idtoken.platformContext.resource.id
+        };
+
+        const lineItem =
+          await lti.Grade.createLineItem(
+            idtoken,
+            newLineItem
+          );
+
+        lineItemId = lineItem.id;
+      } else {
+        lineItemId = lineItems[0].id;
+      }
+    }
+
+    // Send 80/100 to Canvas
+    const gradeObj = {
+      userId: idtoken.user,
+      scoreGiven: 80,
+      scoreMaximum: 100,
+      activityProgress: "Completed",
+      gradingProgress: "FullyGraded"
+    };
+
+    console.log("Sending grade:", gradeObj);
+    console.log("Line Item ID:", lineItemId);
+
+    const result = await lti.Grade.submitScore(
+      idtoken,
+      lineItemId,
+      gradeObj
+    );
+
+    console.log("Grade submitted successfully:", result);
+
+    return res.send(`
+      <html>
+        <head>
+          <title>Grade Submitted</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; padding: 40px;">
+          <h1>Grade Submitted Successfully!</h1>
+
+          <p>
+            Score sent to Canvas:
+            <strong>80 / 100</strong>
+          </p>
+
+          <p>
+            Please return to Canvas and check the Gradebook.
+          </p>
+        </body>
+      </html>
+    `);
+
+  } catch (error) {
+    console.error("=== GRADE SUBMISSION ERROR ===");
+    console.error(error);
+
+    return res.status(500).send(`
+      <html>
+        <body style="font-family: Arial, sans-serif; padding: 40px;">
+          <h1>Grade Submission Failed</h1>
+          <pre>${error.message}</pre>
+        </body>
+      </html>
+    `);
+  }
 });
 
 // LTI Deep Linking
