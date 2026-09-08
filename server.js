@@ -1,9 +1,6 @@
-const express = require("express");
 const lti = require("ltijs").Provider;
 
-const app = express();
 const PORT = process.env.PORT || 3000;
-
 const MONGODB_URI = process.env.MONGODB_URI;
 
 // LTI setup
@@ -24,7 +21,7 @@ lti.setup(
   }
 );
 
-// When Canvas launches the tool from Canvas
+// When Canvas launches the tool
 lti.onConnect((token, req, res) => {
   return res.send(`
     <html>
@@ -41,7 +38,18 @@ lti.onConnect((token, req, res) => {
 });
 
 // Start LTI provider
-lti.deploy({
-  serverless: false,
-  port: PORT
-});
+const start = async () => {
+  try {
+    await lti.deploy({
+      serverless: false,
+      port: PORT
+    });
+
+    console.log("LTI provider started successfully.");
+  } catch (error) {
+    console.error("LTI provider failed to start:", error);
+    process.exit(1);
+  }
+};
+
+start();
