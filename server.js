@@ -18,7 +18,8 @@ lti.setup(
       secure: true,
       sameSite: "None"
     },
-    devMode: false
+    devMode: false,
+    tokenMaxAge: 60
   }
 );
 
