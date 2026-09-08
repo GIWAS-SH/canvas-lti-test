@@ -24,7 +24,7 @@ lti.setup(
   }
 );
 
-// When Canvas launches the tool
+// When Canvas launches the tool from Canvas
 lti.onConnect((token, req, res) => {
   return res.send(`
     <html>
