@@ -116,8 +116,9 @@ async function submitCanvasGrade(idtoken, scoreGiven, mode) {
   return { lineItemId, result };
 }
 
-function resultPage(title, message, details = "") {
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}a{display:inline-block;margin-top:18px}</style></head><body><h1>${escapeHtml(title)}</h1><div>${message}</div>${details}<p><a href="/quiz">返回测试选择</a></p></body></html>`;
+function resultPage(title, message, details = "", ltik = "") {
+  const returnUrl = "/quiz" + (ltik ? "?ltik=" + encodeURIComponent(ltik) : "");
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}a{display:inline-block;margin-top:18px}</style></head><body><h1>${escapeHtml(title)}</h1><div>${message}</div>${details}<p><a href="${returnUrl}">返回测试选择</a></p></body></html>`;
 }
 
 function renderModeSelector(ltik) {
@@ -136,7 +137,7 @@ lti.app.use(express.json());
 lti.app.use(express.urlencoded({ extended: true }));
 lti.onUnregisteredPlatform((req, res) => res.status(400).send({ status: 400, error: "UNREGISTERED_PLATFORM" }));
 lti.onConnect((token, req, res) => lti.redirect(res, "/quiz"));
-lti.app.get("/quiz", (req, res) => res.send(renderModeSelector(res.locals.ltik)));
+lti.app.get("/quiz", (req, res) => res.send(renderModeSelector(res.locals.ltik || req.query.ltik || "")));
 lti.app.get("/quiz/start", (req, res) => {
   const mode = req.query.mode;
   res.send(renderQuiz(res.locals.ltik || req.query.ltik, mode, makeQuestions(mode)));
@@ -159,10 +160,10 @@ lti.app.post("/submit-quiz", async (req, res) => {
       return `<div style="border:1px solid ${right ? '#9c9' : '#e99'};background:${right ? '#f5fff5' : '#fff5f5'};border-radius:8px;padding:12px;margin:10px 0"><b>${q.number}. ${escapeHtml(q.prompt)}</b><p>你的答案：${escapeHtml(answers[i] || "未作答")}</p><p>正确答案：${escapeHtml(q.correct)}</p><p>中文释义：${escapeHtml(q.item.meaning)}</p>${q.item.contextFull ? `<p>完整句：${escapeHtml(q.item.contextFull)}</p>` : ""}</div>`;
     }).join("");
 
-    res.send(resultPage("测试完成", `<h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2><p style="color:green"><strong>成绩已成功提交到 Canvas Gradebook。</strong></p><p>Line Item：${escapeHtml(submitted.lineItemId)}</p><h2>答题反馈</h2>${feedback}`));
+    res.send(resultPage("测试完成", `<h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2><p style="color:green"><strong>成绩已成功提交到 Canvas Gradebook。</strong></p><p>Line Item：${escapeHtml(submitted.lineItemId)}</p><h2>答题反馈</h2>${feedback}`, "", res.locals.ltik || req.query.ltik || ""));
   } catch (error) {
     console.error("[AGS] 正式提交失败:", error);
-    res.status(500).send(resultPage("提交失败", "成绩没有成功提交到 Canvas。", `<pre>${escapeHtml(error.stack || error.message)}</pre>`));
+    res.status(500).send(resultPage("提交失败", "成绩没有成功提交到 Canvas。", `<pre>${escapeHtml(error.stack || error.message)}</pre>`, res.locals.ltik || req.query.ltik || ""));
   }
 });
 
