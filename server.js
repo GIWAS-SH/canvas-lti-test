@@ -5,7 +5,16 @@ const path = require("path");
 const PORT = process.env.PORT || 3000;
 const MONGODB_URI = process.env.MONGODB_URI;
 const LTI_ENCRYPTION_KEY = process.env.LTI_ENCRYPTION_KEY || "canvas-lti-test-secret-key-2026";
-const QUESTION_BANK = JSON.parse(fs.readFileSync(path.join(__dirname, "question_bank.json"), "utf8"));
+const QUESTION_DATA = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "question_bank.json"), "utf8")
+);
+const QUESTION_BANK = Array.isArray(QUESTION_DATA)
+  ? QUESTION_DATA
+  : QUESTION_DATA.words;
+
+if (!Array.isArray(QUESTION_BANK) || QUESTION_BANK.length === 0) {
+  throw new Error("question_bank.json 中没有找到有效的 words 题库数组");
+}
 
 lti.setup(LTI_ENCRYPTION_KEY, { url: MONGODB_URI }, {
   appRoute: "/lti/launch", loginRoute: "/lti/login", keysetRoute: "/lti/keys",
