@@ -23,6 +23,26 @@ lti.setup(
 );
 
 // 普通 LTI Launch
+lti.onUnregisteredPlatform((req, res) => {
+  console.log("=== UNREGISTERED PLATFORM DEBUG ===");
+
+  console.log("METHOD:", req.method);
+  console.log("URL:", req.originalUrl);
+  console.log("BODY:", JSON.stringify(req.body));
+  console.log("QUERY:", JSON.stringify(req.query));
+
+  console.log("ISS:", req.body?.iss || req.query?.iss);
+  console.log("CLIENT_ID:", req.body?.client_id || req.query?.client_id);
+  console.log("DEPLOYMENT_ID:", req.body?.deployment_id || req.query?.deployment_id);
+
+  return res.status(400).send({
+    status: 400,
+    error: "Bad Request",
+    details: {
+      message: "UNREGISTERED_PLATFORM"
+    }
+  });
+});
 lti.onConnect((token, req, res) => {
   return res.send(`
     <html>
