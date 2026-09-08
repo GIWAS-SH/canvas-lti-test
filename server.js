@@ -65,7 +65,7 @@ const start = async () => {
     });
 
     await lti.registerPlatform({
-      url: "https://wisdomhouseacademy.instructure.com",
+      url: "https://canvas.instructure.com",
       name: "Wisdom House Academy Canvas",
       clientId: "22382000000000006",
       authenticationEndpoint:
