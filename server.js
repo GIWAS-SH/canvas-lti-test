@@ -74,29 +74,36 @@ function makeQuestions(mode) {
 }
 
 async function resolveLineItem(idtoken, mode) {
-  let lineItemId = idtoken.platformContext?.endpoint?.lineitem;
-  console.log("[AGS] endpoint.lineitem:", lineItemId || "不存在");
+  const config = MODES[mode];
+  const tag = "toefl-junior-l1-" + mode;
+  console.log("[AGS] 查找成绩项目:", { mode, label: config.label, tag });
 
-  if (!lineItemId) {
-    const response = await lti.Grade.getLineItems(idtoken, { resourceLinkId: true });
-    const lineItems = response.lineItems || [];
-    console.log("[AGS] 当前 Resource Link 的 Line Items 数量:", lineItems.length);
-    if (lineItems.length > 0) {
-      lineItemId = lineItems[0].id;
-    } else {
-      const config = MODES[mode] || MODES.enToZh;
-      const created = await lti.Grade.createLineItem(idtoken, {
-        scoreMaximum: 100,
-        label: "TOEFL Junior List 1 - " + config.label,
-        tag: "toefl-junior-l1-" + mode,
-        resourceLinkId: idtoken.platformContext.resource.id
-      });
-      lineItemId = created.id;
-    }
+  const response = await lti.Grade.getLineItems(idtoken, { resourceLinkId: true });
+  const lineItems = response.lineItems || [];
+  console.log("[AGS] 当前 Resource Link 的 Line Items:", lineItems.map(x => ({ id: x.id, label: x.label, tag: x.tag, scoreMaximum: x.scoreMaximum })));
+
+  let lineItem = lineItems.find(x => x.tag === tag);
+  if (!lineItem) {
+    lineItem = lineItems.find(x => x.label === "TOEFL Junior List 1 - " + config.label);
   }
 
-  console.log("[AGS] 最终使用 Line Item:", lineItemId);
-  return lineItemId;
+  if (!lineItem) {
+    lineItem = await lti.Grade.createLineItem(idtoken, {
+      scoreMaximum: 100,
+      label: "TOEFL Junior List 1 - " + config.label,
+      tag,
+      resourceLinkId: idtoken.platformContext.resource.id
+    });
+    console.log("[AGS] 已创建独立成绩项目:", lineItem);
+  }
+
+  console.log("[AGS] 最终使用 Line Item:", {
+    id: lineItem.id,
+    label: lineItem.label,
+    tag: lineItem.tag,
+    scoreMaximum: lineItem.scoreMaximum
+  });
+  return lineItem.id;
 }
 
 async function submitCanvasGrade(idtoken, scoreGiven, mode) {
