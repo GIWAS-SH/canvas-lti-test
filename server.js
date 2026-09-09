@@ -275,14 +275,19 @@ const submitted = await submitCanvasGrade(
     console.error("[AGS] Canvas 返回头:", error.response?.headers);
     console.error("[AGS] 错误信息:", error.message);
 
-    res.status(500).send(
-      resultPage(
-        "提交失败",
-        "成绩没有成功提交到 Canvas。",
-        `<pre>${escapeHtml(error.stack || error.message)}</pre>`,
-        res.locals.ltik || req.query.ltik || ""
-      )
-    );
+    res.status(500).send(`
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>提交失败</title>
+    </head>
+    <body style="font-family: Arial, sans-serif; padding: 30px;">
+      <h2>成绩提交失败</h2>
+      <p>服务器处理成绩时发生错误，请稍后重试。</p>
+      <p>错误信息：${escapeHtml(error.stack || error.message)}</p>
+    </body>
+  </html>
+`);
   }
 });
 
