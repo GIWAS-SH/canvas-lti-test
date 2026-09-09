@@ -236,8 +236,20 @@ lti.app.post("/submit-quiz", async (req, res) => {
 
     res.send(resultPage("测试完成", `<h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2><p style="color:green"><strong>成绩已成功提交到 Canvas Gradebook。</strong></p><h2>答题反馈</h2>${feedback}`, "", res.locals.ltik || req.query.ltik || ""));
   } catch (error) {
-    console.error("[AGS] 正式提交失败:", error);
-    res.status(500).send(resultPage("提交失败", "成绩没有成功提交到 Canvas。", `<pre>${escapeHtml(error.stack || error.message)}</pre>`, res.locals.ltik || req.query.ltik || ""));
+    console.error("[AGS] 正式提交失败");
+    console.error("[AGS] 状态码:", error.response?.statusCode);
+    console.error("[AGS] Canvas 返回正文:", error.response?.body);
+    console.error("[AGS] Canvas 返回头:", error.response?.headers);
+    console.error("[AGS] 错误信息:", error.message);
+
+    res.status(500).send(
+      resultPage(
+        "提交失败",
+        "成绩没有成功提交到 Canvas。",
+        `<pre>${escapeHtml(error.stack || error.message)}</pre>`,
+        res.locals.ltik || req.query.ltik || ""
+      )
+    );
   }
 });
 
