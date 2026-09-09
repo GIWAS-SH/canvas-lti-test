@@ -86,27 +86,69 @@ const selected = shuffle(listQuestions).slice(
   });
 }
 
-async function resolveLineItem(idtoken, mode) {
+async function resolveLineItem(idtoken, mode, listNumber) {
   const config = MODES[mode];
-  const tag = "toefl-junior-l1-" + mode;
-  console.log("[AGS] 查找成绩项目:", { mode, label: config.label, tag });
 
-  const response = await lti.Grade.getLineItems(idtoken, { resourceLinkId: true });
-  const lineItems = response.lineItems || [];
-  console.log("[AGS] 当前 Resource Link 的 Line Items:", lineItems.map(x => ({ id: x.id, label: x.label, tag: x.tag, scoreMaximum: x.scoreMaximum })));
-
-  let lineItem = lineItems.find(x => x.tag === tag);
-  if (!lineItem) {
-    lineItem = lineItems.find(x => x.label === "TOEFL Junior List 1 - " + config.label);
+  if (!config) {
+    throw new Error("未知测试类型：" + mode);
   }
 
+  if (!listNumber) {
+    throw new Error("没有收到有效的 List 编号");
+  }
+
+  const expectedLabel = `TOEFL Junior List ${listNumber} - ${config.label}`;
+
+  console.log("[AGS] 查找成绩项目:", {
+    mode,
+    listNumber,
+    label: config.label,
+    expectedLabel
+  });
+
+  const response = await lti.Grade.getLineItems(idtoken, {
+    resourceLinkId: true
+  });
+
+  const lineItems = response.lineItems || [];
+
+  console.log(
+    "[AGS] 当前 Resource Link 的 Line Items:",
+    lineItems.map(x => ({
+      id: x.id,
+      label: x.label,
+      tag: x.tag,
+      scoreMaximum: x.scoreMaximum
+    }))
+  );
+
+  // 优先寻找当前 Assignment 对应的成绩项目
+  let lineItem = lineItems.find(
+    x => x.label === expectedLabel
+  );
+
+  // 如果当前 Resource Link 已经有成绩项目，但名称不完全一致，
+  // 且只有一个项目，则直接使用它，避免误创建成绩项目。
+  if (!lineItem && lineItems.length === 1) {
+    lineItem = lineItems[0];
+
+    console.log("[AGS] 当前 Resource Link 只有一个成绩项目，直接使用:", {
+      id: lineItem.id,
+      label: lineItem.label
+    });
+  }
+
+  // 只有当前 Resource Link 完全没有成绩项目时，才创建新的项目
   if (!lineItem) {
+    const tag = `toefl-junior-l${listNumber}-${mode}`;
+
     lineItem = await lti.Grade.createLineItem(idtoken, {
       scoreMaximum: 100,
-      label: "TOEFL Junior List 1 - " + config.label,
+      label: expectedLabel,
       tag,
       resourceLinkId: idtoken.platformContext.resource.id
     });
+
     console.log("[AGS] 已创建独立成绩项目:", lineItem);
   }
 
@@ -116,28 +158,8 @@ async function resolveLineItem(idtoken, mode) {
     tag: lineItem.tag,
     scoreMaximum: lineItem.scoreMaximum
   });
+
   return lineItem.id;
-}
-
-async function submitCanvasGrade(idtoken, scoreGiven, mode) {
-  if (!idtoken) throw new Error("没有取得 Canvas LTI token");
-  if (!idtoken.user) throw new Error("LTI token 中没有 Canvas userId");
-
-  const lineItemId = await resolveLineItem(idtoken, mode);
-  const result = await lti.Grade.submitScore(idtoken, lineItemId, {
-    userId: idtoken.user,
-    scoreGiven,
-    scoreMaximum: 100,
-    activityProgress: "Completed",
-    gradingProgress: "FullyGraded"
-  });
-
-  console.log("[AGS] Canvas 成绩提交成功:", { userId: idtoken.user, scoreGiven, lineItemId, result });
-  return { lineItemId, result };
-}
-
-function resultPage(title, message, details = "", ltik = "") {
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(title)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}a{display:inline-block;margin-top:18px}</style></head><body><h1>${escapeHtml(title)}</h1><div>${message}</div>${details}</body></html>`;
 }
 
 function detectMode(idtoken, req) {
@@ -227,7 +249,18 @@ lti.app.post("/submit-quiz", async (req, res) => {
     const correctCount = questions.reduce((n, q, i) => n + (answers[i] === q.correct ? 1 : 0), 0);
     const percent = Math.round(correctCount / questions.length * 100);
     console.log("[QUIZ]", MODES[mode].label, correctCount + "/" + questions.length, "=", percent);
-    const submitted = await submitCanvasGrade(idtoken, percent, mode);
+    const listNumber = Number(questions[0]?.item?.list);
+
+if (!listNumber) {
+  throw new Error("无法从题目中识别 List 编号");
+}
+
+const submitted = await submitCanvasGrade(
+  idtoken,
+  percent,
+  mode,
+  listNumber
+);
 
     const feedback = questions.map((q, i) => {
       const right = answers[i] === q.correct;
