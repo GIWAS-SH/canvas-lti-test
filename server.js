@@ -16,6 +16,7 @@ if (!Array.isArray(QUESTION_BANK) || QUESTION_BANK.length === 0) {
 lti.setup(LTI_ENCRYPTION_KEY, { url: MONGODB_URI }, {
   appRoute: "/lti/launch",
   loginRoute: "/lti/login",
+  
   keysetRoute: "/lti/keys",
   cookies: { secure: true, sameSite: "None" },
   devMode: false,
@@ -303,7 +304,42 @@ const submitted = await submitCanvasGrade(
       return `<div style="border:1px solid ${right ? '#9c9' : '#e99'};background:${right ? '#f5fff5' : '#fff5f5'};border-radius:8px;padding:12px;margin:10px 0"><b>${q.number}. ${escapeHtml(q.prompt)}</b><p>你的答案：${escapeHtml(answers[i] || "未作答")}</p><p>正确答案：${escapeHtml(q.correct)}</p><p>中文释义：${escapeHtml(q.item.meaning)}</p>${q.item.contextFull ? `<p>完整句：${escapeHtml(q.item.contextFull)}</p>` : ""}</div>`;
     }).join("");
 
-    res.send(resultPage("测试完成", `<h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2><p style="color:green"><strong>成绩已成功提交到 Canvas Gradebook。</strong></p><h2>答题反馈</h2>${feedback}`, "", res.locals.ltik || req.query.ltik || ""));
+    res.send(`
+  <!doctype html>
+  <html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <title>测试完成</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          max-width: 900px;
+          margin: auto;
+          padding: 24px;
+          line-height: 1.5;
+        }
+        .success {
+          color: green;
+          font-weight: bold;
+        }
+        .question {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 12px;
+          margin: 10px 0;
+        }
+      </style>
+    </head>
+    <body>
+      <h1>测试完成</h1>
+      <h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2>
+      <p class="success">成绩已成功提交到 Canvas Gradebook。</p>
+      <h2>答题反馈</h2>
+      ${feedback}
+    </body>
+  </html>
+`);
   } catch (error) {
     console.error("[AGS] 正式提交失败");
     console.error("[AGS] 状态码:", error.response?.statusCode);
