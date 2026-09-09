@@ -9,455 +9,650 @@
       "word": "abandon",
       "phonetic": "[əˈbændən]",
       "meaning": "vt.放弃；弃绝；对…绝望；对…断念",
-      "list": 1
+      "list": 1,
+      "contextFull": "The family had to abandon their car because the road was covered with deep snow.",
+      "contextBlank": "The family had to ______ their car because the road was covered with deep snow.",
+      "correctAnswer": "abandon"
     },
     {
       "id": 2,
       "word": "abnormal",
       "phonetic": "[æbˈnɔːm(ə)l $ -ˈnɔːr-]",
       "meaning": "adj.反常的，异常的；变态的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The doctor said that the test result was abnormal and needed further examination.",
+      "contextBlank": "The doctor said that the test result was ______ and needed further examination.",
+      "correctAnswer": "abnormal"
     },
     {
       "id": 3,
       "word": "aboard",
       "phonetic": "[əˈbɔːd $ əˈbɔːrd]",
       "meaning": "adv.在飞机上；在船上；在火车上prep.在(飞机、 船或火车)上",
-      "list": 1
+      "list": 1,
+      "contextFull": "Everyone was already aboard the train when the doors closed.",
+      "contextBlank": "Everyone was already ______ the train when the doors closed.",
+      "correctAnswer": "aboard"
     },
     {
       "id": 4,
       "word": "abolish",
       "phonetic": "[əˈbɒlɪʃ $ əˈbɑː-]",
       "meaning": "vt.废除，废止",
-      "list": 1
+      "list": 1,
+      "contextFull": "The school decided to abolish the old rule that required students to wear hats indoors.",
+      "contextBlank": "The school decided to ______ the old rule that required students to wear hats indoors.",
+      "correctAnswer": "abolish"
     },
     {
       "id": 5,
       "word": "abrupt",
       "phonetic": "[əˈbrʌpt]",
       "meaning": "adj.突然的，意外的；(言语、行为)粗鲁的，唐突的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The meeting came to an abrupt end when the fire alarm rang.",
+      "contextBlank": "The meeting came to an ______ end when the fire alarm rang.",
+      "correctAnswer": "abrupt"
     },
     {
       "id": 6,
       "word": "absolute",
       "phonetic": "[ˈæbsəluːt]",
       "meaning": "adj.绝对的，完全的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The coach gave us an absolute promise that everyone would get a chance to play.",
+      "contextBlank": "The coach gave us an ______ promise that everyone would get a chance to play.",
+      "correctAnswer": "absolute"
     },
     {
       "id": 7,
       "word": "absorb",
       "phonetic": "[əbˈsɔːb, əbˈzɔːb $ -ɔːrb]",
       "meaning": "vt.吸收；吸引…的注意力",
-      "list": 1
+      "list": 1,
+      "contextFull": "Dark clothes absorb more heat from the sun than light clothes do.",
+      "contextBlank": "Dark clothes ______ more heat from the sun than light clothes do.",
+      "correctAnswer": "absorb"
     },
     {
       "id": 8,
       "word": "abstract",
       "phonetic": "[<a./n.>ˈæbstrækt <v.>əbˈstrækt, æb-]",
       "meaning": "adj.抽象的；理论上的 n.摘要",
-      "list": 1
+      "list": 1,
+      "contextFull": "The students discussed the abstract idea of freedom in their history class.",
+      "contextBlank": "The students discussed the ______ idea of freedom in their history class.",
+      "correctAnswer": "abstract"
     },
     {
       "id": 9,
       "word": "absurd",
       "phonetic": "[əbˈsɜːd, -ˈzɜːd $ -ɜːrd]",
       "meaning": "adj.荒谬的，荒唐的",
-      "list": 1
+      "list": 1,
+      "contextFull": "It would be absurd to wear a winter coat on such a hot summer day.",
+      "contextBlank": "It would be ______ to wear a winter coat on such a hot summer day.",
+      "correctAnswer": "absurd"
     },
     {
       "id": 10,
       "word": "abundant",
       "phonetic": "[əˈbʌndənt]",
       "meaning": "adj.大量的，充足的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The garden produced an abundant supply of tomatoes this year.",
+      "contextBlank": "The garden produced an ______ supply of tomatoes this year.",
+      "correctAnswer": "abundant"
     },
     {
       "id": 11,
       "word": "academic",
       "phonetic": "[ˌækəˈdemɪk◂]",
       "meaning": "adj.学校的，学院的；学术性的",
-      "list": 1
+      "list": 1,
+      "contextFull": "She received an award for her excellent academic performance.",
+      "contextBlank": "She received an award for her excellent ______ performance.",
+      "correctAnswer": "academic"
     },
     {
       "id": 12,
       "word": "accept",
       "phonetic": "[əkˈsept]",
       "meaning": "vt./vi.接受",
-      "list": 1
+      "list": 1,
+      "contextFull": "I was happy to accept my friend's invitation to the science fair.",
+      "contextBlank": "I was happy to ______ my friend's invitation to the science fair.",
+      "correctAnswer": "accept"
     },
     {
       "id": 13,
       "word": "acceptable",
       "phonetic": "[əkˈseptəb(ə)l]",
       "meaning": "adj.可以接受的",
-      "list": 1
+      "list": 1,
+      "contextFull": "Your answer is acceptable, although it could be explained more clearly.",
+      "contextBlank": "Your answer is ______, although it could be explained more clearly.",
+      "correctAnswer": "acceptable"
     },
     {
       "id": 14,
       "word": "access",
       "phonetic": "[ˈækses]",
       "meaning": "n.通道，入口；接近或取得…的方法或权利等",
-      "list": 1
+      "list": 1,
+      "contextFull": "Students need a password to access the school's online library.",
+      "contextBlank": "Students need a password to ______ the school's online library.",
+      "correctAnswer": "access"
     },
     {
       "id": 15,
       "word": "accommodation",
       "phonetic": "[əˌkɒməˈdeɪʃ(ə)n $ əˌkɑː-]",
       "meaning": "n.(尤指仅供短期使用的)住处",
-      "list": 1
+      "list": 1,
+      "contextFull": "The hotel provided comfortable accommodation for the visiting students.",
+      "contextBlank": "The hotel provided comfortable ______ for the visiting students.",
+      "correctAnswer": "accommodation"
     },
     {
       "id": 16,
       "word": "accompany",
       "phonetic": "[əˈkʌmp(ə)ni]",
       "meaning": "vt.陪伴，陪同；伴随",
-      "list": 1
+      "list": 1,
+      "contextFull": "My older brother will accompany me to the doctor's appointment.",
+      "contextBlank": "My older brother will ______ me to the doctor's appointment.",
+      "correctAnswer": "accompany"
     },
     {
       "id": 17,
       "word": "accomplish",
       "phonetic": "[əˈkʌmplɪʃ $ əˈkɑːm-, əˈkʌm-]",
       "meaning": "n.完成(任务、使命、计划等)；实现；达到",
-      "list": 1
+      "list": 1,
+      "contextFull": "With careful planning, the team was able to accomplish its goal.",
+      "contextBlank": "With careful planning, the team was able to ______ its goal.",
+      "correctAnswer": "accomplish"
     },
     {
       "id": 18,
       "word": "according",
       "phonetic": "[əˈkɔːdɪŋ]",
       "meaning": "adj.相符的，一致的，根据…而定的",
-      "list": 1
+      "list": 1,
+      "contextFull": "According to the weather report, it will rain this afternoon.",
+      "contextBlank": "______ to the weather report, it will rain this afternoon.",
+      "correctAnswer": "according"
     },
     {
       "id": 19,
       "word": "account",
       "phonetic": "[əˈkaʊnt]",
       "meaning": "n.账户；账目，账单；解释，理由 vi.解释；报账 vt.认为；把…视为",
-      "list": 1
+      "list": 1,
+      "contextFull": "I opened a savings account to keep the money I earned during the summer.",
+      "contextBlank": "I opened a savings ______ to keep the money I earned during the summer.",
+      "correctAnswer": "account"
     },
     {
       "id": 20,
       "word": "accountant",
       "phonetic": "[əˈkaʊnt(ə)nt]",
       "meaning": "n.会计人员，会计师",
-      "list": 1
+      "list": 1,
+      "contextFull": "The accountant checked the company's bills before paying them.",
+      "contextBlank": "The ______ checked the company's bills before paying them.",
+      "correctAnswer": "accountant"
     },
     {
       "id": 21,
       "word": "accumulate",
       "phonetic": "[əˈkjuːmjəleɪt, əˈkjuːmjʊleɪt]",
       "meaning": "vt./vi.积累.堆积",
-      "list": 1
+      "list": 1,
+      "contextFull": "Dust can accumulate on the shelves if they are not cleaned regularly.",
+      "contextBlank": "Dust can ______ on the shelves if they are not cleaned regularly.",
+      "correctAnswer": "accumulate"
     },
     {
       "id": 22,
       "word": "accurate",
       "phonetic": "[ˈækjərət, ˈækjʊrət]",
       "meaning": "adj.精确的",
-      "list": 1
+      "list": 1,
+      "contextFull": "Please make sure that the information in your report is accurate.",
+      "contextBlank": "Please make sure that the information in your report is ______.",
+      "correctAnswer": "accurate"
     },
     {
       "id": 23,
       "word": "accuse",
       "phonetic": "[əˈkjuːz]",
       "meaning": "vt.指责，谴责；控告",
-      "list": 1
+      "list": 1,
+      "contextFull": "The teacher did not accuse anyone until she had checked all the facts.",
+      "contextBlank": "The teacher did not ______ anyone until she had checked all the facts.",
+      "correctAnswer": "accuse"
     },
     {
       "id": 24,
       "word": "accustom",
       "phonetic": "[əˈkʌstəm]",
       "meaning": "vt.使习惯于",
-      "list": 1
+      "list": 1,
+      "contextFull": "It took me several weeks to accustom myself to waking up early.",
+      "contextBlank": "It took me several weeks to ______ myself to waking up early.",
+      "correctAnswer": "accustom"
     },
     {
       "id": 25,
       "word": "achieve",
       "phonetic": "[əˈtʃiːv]",
       "meaning": "vt.取得，获得；实现，达成",
-      "list": 1
+      "list": 1,
+      "contextFull": "She worked hard to achieve her goal of winning the spelling contest.",
+      "contextBlank": "She worked hard to ______ her goal of winning the spelling contest.",
+      "correctAnswer": "achieve"
     },
     {
       "id": 26,
       "word": "acknowledge",
       "phonetic": "[əkˈnɒlɪdʒ $ -ˈnɑː-]",
       "meaning": "vt.承认；感谢，鸣谢",
-      "list": 1
+      "list": 1,
+      "contextFull": "The student stood up to acknowledge the applause after her performance.",
+      "contextBlank": "The student stood up to ______ the applause after her performance.",
+      "correctAnswer": "acknowledge"
     },
     {
       "id": 27,
       "word": "acquaintance",
       "phonetic": "[əˈkweɪnt(ə)ns]",
       "meaning": "n.相识的人，熟人；相识",
-      "list": 1
+      "list": 1,
+      "contextFull": "Tom is an acquaintance from my art class, but we do not know each other well.",
+      "contextBlank": "Tom is an ______ from my art class, but we do not know each other well.",
+      "correctAnswer": "acquaintance"
     },
     {
       "id": 28,
       "word": "acquire",
       "phonetic": "[əˈkwaɪə $ əˈkwaɪr]",
       "meaning": "n.获得，得到",
-      "list": 1
+      "list": 1,
+      "contextFull": "Children acquire new language skills by listening and practicing every day.",
+      "contextBlank": "Children ______ new language skills by listening and practicing every day.",
+      "correctAnswer": "acquire"
     },
     {
       "id": 29,
       "word": "act",
       "phonetic": "[ækt]",
       "meaning": "vt./vi.行动；做；表演；起作用 n.行为，行动；(戏剧中的)幕",
-      "list": 1
+      "list": 1,
+      "contextFull": "You should act quickly if you see someone in danger.",
+      "contextBlank": "You should ______ quickly if you see someone in danger.",
+      "correctAnswer": "act"
     },
     {
       "id": 30,
       "word": "active",
       "phonetic": "[ˈæktɪv]",
       "meaning": "adj.活泼的，活跃的；积极的；[语]主动的",
-      "list": 1
+      "list": 1,
+      "contextFull": "My grandfather stays active by walking in the park every morning.",
+      "contextBlank": "My grandfather stays ______ by walking in the park every morning.",
+      "correctAnswer": "active"
     },
     {
       "id": 31,
       "word": "actual",
       "phonetic": "[ˈæktʃuəl]",
       "meaning": "adj.实际的，事实的，现实的，真实的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The actual cost of the trip was lower than we expected.",
+      "contextBlank": "The ______ cost of the trip was lower than we expected.",
+      "correctAnswer": "actual"
     },
     {
       "id": 32,
       "word": "adapt",
       "phonetic": "[əˈdæpt]",
       "meaning": "vt./vi.(使)适应，(使)适合；改编，改写",
-      "list": 1
+      "list": 1,
+      "contextFull": "Animals must adapt to changes in their environment in order to survive.",
+      "contextBlank": "Animals must ______ to changes in their environment in order to survive.",
+      "correctAnswer": "adapt"
     },
     {
       "id": 33,
       "word": "adjust",
       "phonetic": "[əˈdʒʌst]",
       "meaning": "vt./vi.改变…以适应；调整；校正",
-      "list": 1
+      "list": 1,
+      "contextFull": "Please adjust the height of the chair so that you can sit comfortably.",
+      "contextBlank": "Please ______ the height of the chair so that you can sit comfortably.",
+      "correctAnswer": "adjust"
     },
     {
       "id": 34,
       "word": "administrate",
       "phonetic": "[ədˌmɪnəˈstreɪt, ədˌmɪnɪˈstreɪt]",
       "meaning": "vt.管理，经营；实施",
-      "list": 1
+      "list": 1,
+      "contextFull": "The principal was chosen to administrate the new education program.",
+      "contextBlank": "The principal was chosen to ______ the new education program.",
+      "correctAnswer": "administrate"
     },
     {
       "id": 35,
       "word": "admire",
       "phonetic": "[ədˈmaɪə $ -ˈmaɪr]",
       "meaning": "n.赞赏；钦佩",
-      "list": 1
+      "list": 1,
+      "contextFull": "Many students admire their teacher because she is patient and helpful.",
+      "contextBlank": "Many students ______ their teacher because she is patient and helpful.",
+      "correctAnswer": "admire"
     },
     {
       "id": 36,
       "word": "admit",
       "phonetic": "[ədˈmɪt]",
       "meaning": "vt./vi.许可…进入；承认；供认",
-      "list": 1
+      "list": 1,
+      "contextFull": "The museum will not admit visitors after six o'clock.",
+      "contextBlank": "The museum will not ______ visitors after six o'clock.",
+      "correctAnswer": "admit"
     },
     {
       "id": 37,
       "word": "adopt",
       "phonetic": "[əˈdɒpt $ əˈdɑːpt]",
       "meaning": "vt.收养；采取，采纳",
-      "list": 1
+      "list": 1,
+      "contextFull": "The city plans to adopt a new system for recycling plastic bottles.",
+      "contextBlank": "The city plans to ______ a new system for recycling plastic bottles.",
+      "correctAnswer": "adopt"
     },
     {
       "id": 38,
       "word": "adore",
       "phonetic": "[əˈdɔː $ əˈdɔːr]",
       "meaning": "n.爱慕，崇拜",
-      "list": 1
+      "list": 1,
+      "contextFull": "The little girl adores her baby brother and always wants to help him.",
+      "contextBlank": "The little girl ______ her baby brother and always wants to help him.",
+      "correctAnswer": "adore"
     },
     {
       "id": 39,
       "word": "adult",
       "phonetic": "[ˈædʌlt, əˈdʌlt]",
       "meaning": "n.成年人",
-      "list": 1
+      "list": 1,
+      "contextFull": "An adult must sign the form before the child can join the trip.",
+      "contextBlank": "An ______ must sign the form before the child can join the trip.",
+      "correctAnswer": "adult"
     },
     {
       "id": 40,
       "word": "advance",
       "phonetic": "[ədˈvɑːns $ ədˈvæns]",
       "meaning": "vt./vi.(使)前进，(使)发展 n.前进，发展；改进，进步",
-      "list": 1
+      "list": 1,
+      "contextFull": "The students made great advance in reading after practicing every day.",
+      "contextBlank": "The students made great ______ in reading after practicing every day.",
+      "correctAnswer": "advance"
     },
     {
       "id": 41,
       "word": "advantage",
       "phonetic": "[ədˈvɑːntɪdʒ $ ədˈvæn-]",
       "meaning": "n.有利条件，优势",
-      "list": 1
+      "list": 1,
+      "contextFull": "Speaking two languages gives her an advantage when applying for the job.",
+      "contextBlank": "Speaking two languages gives her an ______ when applying for the job.",
+      "correctAnswer": "advantage"
     },
     {
       "id": 42,
       "word": "adventure",
       "phonetic": "[ədˈventʃə $ -ər]",
       "meaning": "n.冒险",
-      "list": 1
+      "list": 1,
+      "contextFull": "Our trip through the forest was an exciting adventure.",
+      "contextBlank": "Our trip through the forest was an exciting ______.",
+      "correctAnswer": "adventure"
     },
     {
       "id": 43,
       "word": "advertise",
       "phonetic": "[ˈædvətaɪz $ -ər-]",
       "meaning": "vt./vi.(给…)做广告宣传",
-      "list": 1
+      "list": 1,
+      "contextFull": "The company will advertise its new product on television.",
+      "contextBlank": "The company will ______ its new product on television.",
+      "correctAnswer": "advertise"
     },
     {
       "id": 44,
       "word": "advise",
       "phonetic": "[ədˈvaɪz]",
       "meaning": "vt./vi.劝告；提建议",
-      "list": 1
+      "list": 1,
+      "contextFull": "The nurse advised me to drink plenty of water.",
+      "contextBlank": "The nurse ______ me to drink plenty of water.",
+      "correctAnswer": "advise"
     },
     {
       "id": 45,
       "word": "advice",
       "phonetic": "[ədˈvaɪs]",
       "meaning": "n.意见，建议",
-      "list": 1
+      "list": 1,
+      "contextFull": "My teacher gave me useful advice before the examination.",
+      "contextBlank": "My teacher gave me useful ______ before the examination.",
+      "correctAnswer": "advice"
     },
     {
       "id": 46,
       "word": "advocate",
       "phonetic": "[<v.>ˈædvəkeɪt <n.>ˈædvəkət, ˈædvəkɪt, -keɪt]",
       "meaning": "vt.提倡，主张 n.提倡者，拥护者",
-      "list": 1
+      "list": 1,
+      "contextFull": "Many scientists advocate using less plastic to protect the oceans.",
+      "contextBlank": "Many scientists ______ using less plastic to protect the oceans.",
+      "correctAnswer": "advocate"
     },
     {
       "id": 47,
       "word": "afraid",
       "phonetic": "[əˈfreɪd]",
       "meaning": "adj.害怕的，恐惧的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The child was afraid of the loud thunder during the storm.",
+      "contextBlank": "The child was ______ of the loud thunder during the storm.",
+      "correctAnswer": "afraid"
     },
     {
       "id": 48,
       "word": "Africa",
       "phonetic": "[ˈæfrɪkə]",
       "meaning": "n.非洲",
-      "list": 1
+      "list": 1,
+      "contextFull": "Kenya is a country in Africa.",
+      "contextBlank": "Kenya is a country in ______.",
+      "correctAnswer": "Africa"
     },
     {
       "id": 49,
       "word": "agency",
       "phonetic": "[ˈeɪdʒ(ə)nsi]",
       "meaning": "n.经销处；代理行，代理机构",
-      "list": 1
+      "list": 1,
+      "contextFull": "We booked our family vacation through a travel agency.",
+      "contextBlank": "We booked our family vacation through a travel ______.",
+      "correctAnswer": "agency"
     },
     {
       "id": 50,
       "word": "aggressive",
       "phonetic": "[əˈɡresɪv]",
       "meaning": "adj.好争斗的，挑衅的；侵略性的；有干劲儿的，积极进取的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The dog became aggressive when a stranger entered its yard.",
+      "contextBlank": "The dog became ______ when a stranger entered its yard.",
+      "correctAnswer": "aggressive"
     },
     {
       "id": 51,
       "word": "agile",
       "phonetic": "[ˈædʒaɪl $ ˈædʒ(ə)l]",
       "meaning": "adj.灵巧的；轻快的；机敏的",
-      "list": 1
+      "list": 1,
+      "contextFull": "The agile cat quickly jumped from one wall to another.",
+      "contextBlank": "The ______ cat quickly jumped from one wall to another.",
+      "correctAnswer": "agile"
     },
     {
       "id": 52,
       "word": "agriculture",
       "phonetic": "[ˈæɡrɪˌkʌltʃə $ -ər]",
       "meaning": "n.农业",
-      "list": 1
+      "list": 1,
+      "contextFull": "Agriculture is important because it provides food for millions of people.",
+      "contextBlank": "______ is important because it provides food for millions of people.",
+      "correctAnswer": "agriculture"
     },
     {
       "id": 53,
       "word": "album",
       "phonetic": "[ˈælbəm]",
       "meaning": "n.唱片；粘贴薄，集邮簿；相册，影集",
-      "list": 1
+      "list": 1,
+      "contextFull": "My sister keeps pictures from every school year in a photo album.",
+      "contextBlank": "My sister keeps pictures from every school year in a photo ______.",
+      "correctAnswer": "album"
     },
     {
       "id": 54,
       "word": "alcohol",
       "phonetic": "[ˈælkəhɒl $ -hɒːl]",
       "meaning": "n.酒精，酒",
-      "list": 1
+      "list": 1,
+      "contextFull": "The science teacher warned us that alcohol can damage the human body.",
+      "contextBlank": "The science teacher warned us that ______ can damage the human body.",
+      "correctAnswer": "alcohol"
     },
     {
       "id": 55,
       "word": "alert",
       "phonetic": "[əˈlɜːt $ -ɜːrt]",
       "meaning": "adj.警觉的，警惕的；注意的 vt.使警觉；向…报警",
-      "list": 1
+      "list": 1,
+      "contextFull": "The guard stayed alert while watching the entrance.",
+      "contextBlank": "The guard stayed ______ while watching the entrance.",
+      "correctAnswer": "alert"
     },
     {
       "id": 56,
       "word": "algae",
       "phonetic": "[ˈældʒiː, -ɡiː]",
       "meaning": "n.藻类；海藻",
-      "list": 1
+      "list": 1,
+      "contextFull": "Green algae covered the surface of the pond during the hot summer.",
+      "contextBlank": "Green ______ covered the surface of the pond during the hot summer.",
+      "correctAnswer": "algae"
     },
     {
       "id": 57,
       "word": "Algebra",
       "phonetic": "[ˈældʒəbrə, ˈældʒɪbrə]",
       "meaning": "n.代数学，代数",
-      "list": 1
+      "list": 1,
+      "contextFull": "We used algebra to find the unknown number in the equation.",
+      "contextBlank": "We used ______ to find the unknown number in the equation.",
+      "correctAnswer": "Algebra"
     },
     {
       "id": 58,
       "word": "alien",
       "phonetic": "[ˈeɪliən]",
       "meaning": "adj.外国的 n.外国人；外星人",
-      "list": 1
+      "list": 1,
+      "contextFull": "The movie is about an alien who visits Earth from a distant planet.",
+      "contextBlank": "The movie is about an ______ who visits Earth from a distant planet.",
+      "correctAnswer": "alien"
     },
     {
       "id": 59,
       "word": "allergy",
       "phonetic": "[ˈælədʒi $ -ər-]",
       "meaning": "n.(由食物、花粉、虫咬引起的)过敏症",
-      "list": 1
+      "list": 1,
+      "contextFull": "Because of her peanut allergy, she always checks the ingredients on food packages.",
+      "contextBlank": "Because of her peanut ______, she always checks the ingredients on food packages.",
+      "correctAnswer": "allergy"
     },
     {
       "id": 60,
       "word": "alliance",
       "phonetic": "[əˈlaɪəns]",
       "meaning": "n.(国家、政党等的)结盟，同盟，联盟；同盟条约；联姻",
-      "list": 1
+      "list": 1,
+      "contextFull": "The two countries formed an alliance to work together during the crisis.",
+      "contextBlank": "The two countries formed an ______ to work together during the crisis.",
+      "correctAnswer": "alliance"
     },
     {
       "id": 61,
       "word": "allocate",
       "phonetic": "[ˈæləkeɪt]",
       "meaning": "n.分配，分派；把…拨给",
-      "list": 1
+      "list": 1,
+      "contextFull": "The teacher will allocate five minutes to each group for its presentation.",
+      "contextBlank": "The teacher will ______ five minutes to each group for its presentation.",
+      "correctAnswer": "allocate"
     },
     {
       "id": 62,
       "word": "allow",
       "phonetic": "[əˈlaʊ]",
       "meaning": "n.允许，许可",
-      "list": 1
+      "list": 1,
+      "contextFull": "The school does not allow students to use phones during tests.",
+      "contextBlank": "The school does not ______ students to use phones during tests.",
+      "correctAnswer": "allow"
     },
     {
       "id": 63,
       "word": "allowance",
       "phonetic": "[əˈlaʊəns]",
       "meaning": "n.允许；津贴，补助",
-      "list": 1
+      "list": 1,
+      "contextFull": "His parents give him a weekly allowance for small personal expenses.",
+      "contextBlank": "His parents give him a weekly ______ for small personal expenses.",
+      "correctAnswer": "allowance"
     },
     {
       "id": 64,
       "word": "alpha",
       "phonetic": "[ˈælfə]",
       "meaning": "n.希腊字母表的第一个字母，即α",
-      "list": 1
+      "list": 1,
+      "contextFull": "In the Greek alphabet, alpha is the first letter.",
+      "contextBlank": "In the Greek alphabet, ______ is the first letter.",
+      "correctAnswer": "alpha"
     },
     {
       "id": 65,
       "word": "alphabet",
       "phonetic": "[ˈælfəbet]",
       "meaning": "n.字母表",
-      "list": 1
+      "list": 1,
+      "contextFull": "The children practiced writing every letter of the alphabet.",
+      "contextBlank": "The children practiced writing every letter of the ______.",
+      "correctAnswer": "alphabet"
     },
     {
       "id": 66,
