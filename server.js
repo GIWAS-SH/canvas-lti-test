@@ -140,6 +140,23 @@ function detectMode(idtoken, req) {
   return null;
 }
 
+function detectListNumber(idtoken, req) {
+  const text = [
+    idtoken?.platformContext?.resource?.title,
+    idtoken?.platformContext?.resource?.description,
+    req?.query?.assignment_name,
+    req?.query?.title
+  ].filter(Boolean).join(" ");
+
+  const match = text.match(/List\s*(\d+)/i);
+
+  if (!match) {
+    throw new Error("无法识别当前 Assignment 的 List 编号：" + text);
+  }
+
+  return Number(match[1]);
+}
+
 function renderQuiz(ltik, mode, questions) {
   const config = MODES[mode];
   const payload = encodeURIComponent(JSON.stringify(questions));
