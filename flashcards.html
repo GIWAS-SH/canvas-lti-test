@@ -97,11 +97,19 @@
     }
 
     .word {
-      font-size: 42px;
-      font-weight: bold;
-      margin-bottom: 18px;
-      word-break: break-word;
-    }
+  font-size: 42px;
+  font-weight: bold;
+  margin-bottom: 18px;
+  word-break: break-word;
+}
+
+.card-back .word {
+  font-size: 36px;
+}
+
+.card-back .phonetic {
+  margin-top: 8px;
+}
 
     .phonetic {
       font-size: 20px;
@@ -168,13 +176,18 @@
     <h1>TOEFL Junior Vocabulary Flashcards</h1>
 
     <div class="controls">
-      <select id="listSelect">
-        <option value="all">全部 List</option>
-      </select>
+  <select id="listSelect">
+    <option value="all">全部 List</option>
+  </select>
 
-      <button id="shuffleButton">随机排序</button>
-      <button id="restartButton">重新开始</button>
-    </div>
+  <select id="modeSelect">
+    <option value="en-zh">英译中</option>
+    <option value="zh-en">中译英</option>
+  </select>
+
+  <button id="shuffleButton">随机排序</button>
+  <button id="restartButton">重新开始</button>
+</div>
 
     <div class="progress" id="progress">
       正在读取词汇……
@@ -183,16 +196,18 @@
     <div class="card-area">
       <div class="flashcard" id="flashcard">
         <div class="card-face card-front">
-          <div class="word" id="frontWord"></div>
-          <div class="phonetic" id="frontPhonetic"></div>
-          <div class="hint">点击卡片查看中文意思</div>
-        </div>
+  <div class="word" id="frontWord"></div>
+  <div class="phonetic" id="frontPhonetic"></div>
+  <div class="hint" id="frontHint">点击卡片查看中文意思</div>
+</div>
 
-        <div class="card-face card-back">
-          <div class="meaning" id="backMeaning"></div>
-          <div class="list-label" id="backList"></div>
-          <div class="hint">点击卡片返回英文</div>
-        </div>
+<div class="card-face card-back">
+  <div class="meaning" id="backMeaning"></div>
+  <div class="word" id="backWord"></div>
+  <div class="phonetic" id="backPhonetic"></div>
+  <div class="list-label" id="backList"></div>
+  <div class="hint" id="backHint">点击卡片返回英文</div>
+</div>
       </div>
     </div>
 
@@ -211,10 +226,16 @@
 
     const listSelect = document.getElementById("listSelect");
     const flashcard = document.getElementById("flashcard");
+    const modeSelect = document.getElementById("modeSelect");
     const frontWord = document.getElementById("frontWord");
     const frontPhonetic = document.getElementById("frontPhonetic");
-    const backMeaning = document.getElementById("backMeaning");
-    const backList = document.getElementById("backList");
+const backMeaning = document.getElementById("backMeaning");
+const backWord = document.getElementById("backWord");
+const backPhonetic = document.getElementById("backPhonetic");
+const backList = document.getElementById("backList");
+
+const frontHint = document.getElementById("frontHint");
+const backHint = document.getElementById("backHint");
     const progress = document.getElementById("progress");
     const message = document.getElementById("message");
 
@@ -296,27 +317,49 @@
     }
 
     function showCard() {
-      flashcard.classList.remove("flipped");
+  flashcard.classList.remove("flipped");
 
-      if (currentWords.length === 0) {
-        progress.textContent = "没有找到词汇";
-        frontWord.textContent = "";
-        frontPhonetic.textContent = "";
-        backMeaning.textContent = "";
-        backList.textContent = "";
-        return;
-      }
+  if (currentWords.length === 0) {
+    progress.textContent = "没有找到词汇";
+    frontWord.textContent = "";
+    frontPhonetic.textContent = "";
+    backMeaning.textContent = "";
+    backWord.textContent = "";
+    backPhonetic.textContent = "";
+    backList.textContent = "";
+    return;
+  }
 
-      const item = currentWords[currentIndex];
+  const item = currentWords[currentIndex];
+  const mode = modeSelect.value;
 
-      frontWord.textContent = item.word || "";
-      frontPhonetic.textContent = item.phonetic || "暂无音标";
-      backMeaning.textContent = item.meaning || "暂无中文意思";
-      backList.textContent = item.list || "";
+  if (mode === "en-zh") {
+    // 英译中：正面英文，背面中文
+    frontWord.textContent = item.word || "";
+    frontPhonetic.textContent = item.phonetic || "暂无音标";
+    frontHint.textContent = "点击卡片查看中文意思";
 
-      progress.textContent =
-        `第 ${currentIndex + 1} / ${currentWords.length} 张`;
-    }
+    backMeaning.textContent = item.meaning || "暂无中文意思";
+    backWord.textContent = "";
+    backPhonetic.textContent = "";
+    backHint.textContent = "点击卡片返回英文";
+  } else {
+    // 中译英：正面中文，背面英文
+    frontWord.textContent = item.meaning || "暂无中文意思";
+    frontPhonetic.textContent = "";
+    frontHint.textContent = "点击卡片查看英文";
+
+    backMeaning.textContent = "";
+    backWord.textContent = item.word || "";
+    backPhonetic.textContent = item.phonetic || "暂无音标";
+    backHint.textContent = "点击卡片返回中文";
+  }
+
+  backList.textContent = item.list || "";
+
+  progress.textContent =
+    `第 ${currentIndex + 1} / ${currentWords.length} 张`;
+}
 
     function nextCard() {
       if (currentWords.length === 0) return;
@@ -338,6 +381,10 @@
     }
 
     listSelect.addEventListener("change", applyListFilter);
+    modeSelect.addEventListener("change", () => {
+  currentIndex = 0;
+  showCard();
+});
 
     document.getElementById("shuffleButton")
       .addEventListener("click", () => {
