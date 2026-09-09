@@ -329,7 +329,9 @@ lti.app.post("/submit-quiz", async (req, res) => {
     const correctCount = questions.reduce((n, q, i) => n + (answers[i] === q.correct ? 1 : 0), 0);
     const percent = Math.round(correctCount / questions.length * 100);
     console.log("[QUIZ]", MODES[mode].label, correctCount + "/" + questions.length, "=", percent);
-    const listNumber = Number(questions[0]?.item?.list);
+    const listNumber = Number(
+  String(questions[0]?.item?.list ?? "").match(/\d+/)?.[0]
+);
 
 if (!listNumber) {
   throw new Error("无法从题目中识别 List 编号");
