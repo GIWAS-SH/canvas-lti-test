@@ -182,9 +182,25 @@ lti.onUnregisteredPlatform((req, res) => res.status(400).send({ status: 400, err
 lti.onConnect((token, req, res) => lti.redirect(res, "/quiz"));
 lti.app.get("/quiz", (req, res) => {
   const idtoken = res.locals.token;
+
   const mode = detectMode(idtoken, req);
-  if (!mode) return res.status(400).send("无法识别当前 Canvas 作业对应的测试类型。请检查作业名称是否包含：英译中、中译英或语境题。" );
-  res.send(renderQuiz(res.locals.ltik || req.query.ltik || "", mode, makeQuestions(mode)));
+  const listNumber = detectListNumber(idtoken, req);
+
+  if (!mode) {
+    return res.status(400).send(
+      "无法识别当前 Canvas 作业对应的测试类型。请检查作业名称是否包含：英译中、中译英或语境题。"
+    );
+  }
+
+  console.log("[QUIZ] 当前 List:", listNumber, "测试类型:", mode);
+
+  res.send(
+    renderQuiz(
+      res.locals.ltik || req.query.ltik || "",
+      mode,
+      makeQuestions(mode)
+    )
+  );
 });
 lti.app.get("/quiz/start", (req, res) => res.redirect("/quiz"));
 
