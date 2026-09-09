@@ -43,13 +43,26 @@ const MODES = {
   context: { label: "语境题", count: 20, description: "根据句子语境，选择最合适的单词。" }
 };
 
-function makeQuestions(mode) {
+function makeQuestions(mode, listNumber) {
   const config = MODES[mode];
   if (!config) throw new Error("未知测试类型：" + mode);
 
-  const selected = shuffle(QUESTION_BANK).slice(0, Math.min(config.count, QUESTION_BANK.length));
+  const listQuestions = QUESTION_BANK.filter(
+  item => Number(item.list) === Number(listNumber)
+);
+
+if (listQuestions.length === 0) {
+  throw new Error("没有找到 List " + listNumber + " 的题目。");
+}
+
+const selected = shuffle(listQuestions).slice(
+  0,
+  Math.min(config.count, listQuestions.length)
+);
   return selected.map((item, index) => {
-    const distractors = shuffle(QUESTION_BANK.filter(x => x.id !== item.id)).slice(0, 3);
+    const distractors = shuffle(
+  listQuestions.filter(x => x.id !== item.id)
+).slice(0, 3);
     let prompt;
     let correct;
 
@@ -198,7 +211,7 @@ lti.app.get("/quiz", (req, res) => {
     renderQuiz(
       res.locals.ltik || req.query.ltik || "",
       mode,
-      makeQuestions(mode)
+      makeQuestions(mode, listNumber)
     )
   );
 });
