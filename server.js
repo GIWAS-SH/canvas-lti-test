@@ -46,24 +46,49 @@ const MODES = {
 
 function makeQuestions(mode, listNumber) {
   const config = MODES[mode];
-  if (!config) throw new Error("未知测试类型：" + mode);
 
-  const listQuestions = QUESTION_BANK.filter(
-  item => Number(item.list) === Number(listNumber)
-);
+  if (!config) {
+    throw new Error("未知测试类型：" + mode);
+  }
 
-if (listQuestions.length === 0) {
-  throw new Error("没有找到 List " + listNumber + " 的题目。");
-}
+  const targetList = String(listNumber || "").trim();
 
-const selected = shuffle(listQuestions).slice(
-  0,
-  Math.min(config.count, listQuestions.length)
-);
+  const listQuestions = QUESTION_BANK.filter(item => {
+    const itemList = String(item.list || "").trim();
+
+    return (
+      itemList === targetList ||
+      itemList === `(L${targetList})` ||
+      itemList === `L${targetList}`
+    );
+  });
+
+  if (listQuestions.length === 0) {
+    throw new Error(`没有找到 List ${targetList} 的题目。`);
+  }
+
+  if (mode === "context") {
+    const missingContext = listQuestions.filter(item => {
+      return !item.contextBlank || !item.correctAnswer;
+    });
+
+    if (missingContext.length > 0) {
+      throw new Error(
+        `List ${targetList} 还有 ${missingContext.length} 个单词缺少语境题数据。`
+      );
+    }
+  }
+
+  const selected = shuffle(listQuestions).slice(
+    0,
+    Math.min(config.count, listQuestions.length)
+  );
+
   return selected.map((item, index) => {
     const distractors = shuffle(
-  listQuestions.filter(x => x.id !== item.id)
-).slice(0, 3);
+      listQuestions.filter(x => x.id !== item.id)
+    ).slice(0, 3);
+
     let prompt;
     let correct;
 
@@ -73,17 +98,35 @@ const selected = shuffle(listQuestions).slice(
     } else if (mode === "zhToEn") {
       prompt = item.meaning;
       correct = item.word;
-    } else {
-      prompt = item.contextBlank || item.contextFull || item.word;
-      correct = item.correctAnswer || item.word;
+    } else if (mode === "context") {
+      prompt = item.contextBlank;
+      correct = item.correctAnswer;
     }
 
     const options = shuffle([
       correct,
-      ...distractors.map(x => mode === "enToZh" ? x.meaning : mode === "zhToEn" ? x.word : (x.correctAnswer || x.word))
+      ...distractors.map(item => {
+        if (mode === "enToZh") {
+          return item.meaning;
+        }
+
+        if (mode === "zhToEn") {
+          return item.word;
+        }
+
+        return item.correctAnswer;
+      })
     ]);
 
-    return { number: index + 1, id: item.id, mode, prompt, options, correct, item };
+    return {
+      number: index + 1,
+      id: item.id,
+      mode,
+      prompt,
+      options,
+      correct,
+      item
+    };
   });
 }
 
