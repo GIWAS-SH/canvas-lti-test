@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOEFL Junior Vocabulary Flashcards</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      background: #f4f6f8;
+      color: #202124;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    select,
+    button {
+      padding: 10px 14px;
+      border: 1px solid #c7cdd4;
+      border-radius: 8px;
+      background: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #eef3f8;
+    }
+
+    .progress {
+      margin-bottom: 12px;
+      text-align: center;
+      color: #5f6368;
+    }
+
+    .card-area {
+      perspective: 1000px;
+      margin-bottom: 20px;
+    }
+
+    .flashcard {
+      width: 100%;
+      min-height: 320px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s;
+      cursor: pointer;
+    }
+
+    .flashcard.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+      border-radius: 18px;
+      background: white;
+      border: 1px solid #dfe3e8;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+      backface-visibility: hidden;
+      text-align: center;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background: #f8fbff;
+    }
+
+    .word {
+      font-size: 42px;
+      font-weight: bold;
+      margin-bottom: 18px;
+      word-break: break-word;
+    }
+
+    .phonetic {
+      font-size: 20px;
+      color: #5f6368;
+      margin-bottom: 16px;
+    }
+
+    .meaning {
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 20px;
+      word-break: break-word;
+    }
+
+    .list-label {
+      color: #5f6368;
+      font-size: 16px;
+    }
+
+    .hint {
+      color: #80868b;
+      font-size: 14px;
+    }
+
+    .navigation {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .message {
+      text-align: center;
+      padding: 30px;
+      color: #5f6368;
+    }
+
+    @media (max-width: 500px) {
+      body {
+        padding: 14px;
+      }
+
+      .word {
+        font-size: 32px;
+      }
+
+      .meaning {
+        font-size: 23px;
+      }
+
+      .card-face {
+        min-height: 280px;
+      }
+
+      .flashcard {
+        min-height: 280px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>TOEFL Junior Vocabulary Flashcards</h1>
+
+    <div class="controls">
+      <select id="listSelect">
+        <option value="all">全部 List</option>
+      </select>
+
+      <button id="shuffleButton">随机排序</button>
+      <button id="restartButton">重新开始</button>
+    </div>
+
+    <div class="progress" id="progress">
+      正在读取词汇……
+    </div>
+
+    <div class="card-area">
+      <div class="flashcard" id="flashcard">
+        <div class="card-face card-front">
+          <div class="word" id="frontWord"></div>
+          <div class="phonetic" id="frontPhonetic"></div>
+          <div class="hint">点击卡片查看中文意思</div>
+        </div>
+
+        <div class="card-face card-back">
+          <div class="meaning" id="backMeaning"></div>
+          <div class="list-label" id="backList"></div>
+          <div class="hint">点击卡片返回英文</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button id="previousButton">上一张</button>
+      <button id="nextButton">下一张</button>
+    </div>
+
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    let allWords = [];
+    let currentWords = [];
+    let currentIndex = 0;
+
+    const listSelect = document.getElementById("listSelect");
+    const flashcard = document.getElementById("flashcard");
+    const frontWord = document.getElementById("frontWord");
+    const frontPhonetic = document.getElementById("frontPhonetic");
+    const backMeaning = document.getElementById("backMeaning");
+    const backList = document.getElementById("backList");
+    const progress = document.getElementById("progress");
+    const message = document.getElementById("message");
+
+    async function loadWords() {
+      try {
+        const response = await fetch("question_bank.json");
+
+        if (!response.ok) {
+          throw new Error("无法读取 question_bank.json");
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error("question_bank.json 不是数组格式");
+        }
+
+        allWords = data.filter(item =>
+          item &&
+          item.word &&
+          item.meaning
+        );
+
+        createListOptions();
+        applyListFilter();
+
+        message.textContent = "";
+      } catch (error) {
+        console.error(error);
+        progress.textContent = "词汇读取失败";
+        message.textContent =
+          "请检查 question_bank.json 是否与 flashcards.html 位于同一个目录。";
+      }
+    }
+
+    function createListOptions() {
+      const listNumbers = [...new Set(
+        allWords
+          .map(item => item.list)
+          .filter(Boolean)
+      )];
+
+      listNumbers.sort((a, b) => {
+        const numberA = Number(String(a).match(/\d+/)?.[0] || 0);
+        const numberB = Number(String(b).match(/\d+/)?.[0] || 0);
+        return numberA - numberB;
+      });
+
+      for (const listName of listNumbers) {
+        const option = document.createElement("option");
+        option.value = listName;
+        option.textContent = listName;
+        listSelect.appendChild(option);
+      }
+    }
+
+    function applyListFilter() {
+      const selectedList = listSelect.value;
+
+      if (selectedList === "all") {
+        currentWords = [...allWords];
+      } else {
+        currentWords = allWords.filter(
+          item => item.list === selectedList
+        );
+      }
+
+      currentIndex = 0;
+      shuffleCurrentWords();
+      showCard();
+    }
+
+    function shuffleCurrentWords() {
+      for (let i = currentWords.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [currentWords[i], currentWords[j]] =
+          [currentWords[j], currentWords[i]];
+      }
+    }
+
+    function showCard() {
+      flashcard.classList.remove("flipped");
+
+      if (currentWords.length === 0) {
+        progress.textContent = "没有找到词汇";
+        frontWord.textContent = "";
+        frontPhonetic.textContent = "";
+        backMeaning.textContent = "";
+        backList.textContent = "";
+        return;
+      }
+
+      const item = currentWords[currentIndex];
+
+      frontWord.textContent = item.word || "";
+      frontPhonetic.textContent = item.phonetic || "暂无音标";
+      backMeaning.textContent = item.meaning || "暂无中文意思";
+      backList.textContent = item.list || "";
+
+      progress.textContent =
+        `第 ${currentIndex + 1} / ${currentWords.length} 张`;
+    }
+
+    function nextCard() {
+      if (currentWords.length === 0) return;
+
+      currentIndex =
+        (currentIndex + 1) % currentWords.length;
+
+      showCard();
+    }
+
+    function previousCard() {
+      if (currentWords.length === 0) return;
+
+      currentIndex =
+        (currentIndex - 1 + currentWords.length) %
+        currentWords.length;
+
+      showCard();
+    }
+
+    listSelect.addEventListener("change", applyListFilter);
+
+    document.getElementById("shuffleButton")
+      .addEventListener("click", () => {
+        shuffleCurrentWords();
+        currentIndex = 0;
+        showCard();
+      });
+
+    document.getElementById("restartButton")
+      .addEventListener("click", () => {
+        currentIndex = 0;
+        showCard();
+      });
+
+    document.getElementById("previousButton")
+      .addEventListener("click", previousCard);
+
+    document.getElementById("nextButton")
+      .addEventListener("click", nextCard);
+
+    flashcard.addEventListener("click", () => {
+      flashcard.classList.toggle("flipped");
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "ArrowRight") {
+        nextCard();
+      }
+
+      if (event.key === "ArrowLeft") {
+        previousCard();
+      }
+
+      if (event.key === " ") {
+        event.preventDefault();
+        flashcard.classList.toggle("flipped");
+      }
+    });
+
+    loadWords();
+  </script>
+</body>
+</html>
