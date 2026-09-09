@@ -162,6 +162,42 @@ async function resolveLineItem(idtoken, mode, listNumber) {
   return lineItem.id;
 }
 
+async function submitCanvasGrade(idtoken, scoreGiven, mode, listNumber) {
+  if (!idtoken) {
+    throw new Error("没有取得 Canvas LTI token");
+  }
+
+  if (!idtoken.user) {
+    throw new Error("LTI token 中没有 Canvas userId");
+  }
+
+  const lineItemId = await resolveLineItem(
+    idtoken,
+    mode,
+    listNumber
+  );
+
+  const result = await lti.Grade.submitScore(idtoken, lineItemId, {
+    userId: idtoken.user,
+    scoreGiven,
+    scoreMaximum: 100,
+    activityProgress: "Completed",
+    gradingProgress: "FullyGraded"
+  });
+
+  console.log("[AGS] Canvas 成绩提交成功:", {
+    userId: idtoken.user,
+    scoreGiven,
+    lineItemId,
+    result
+  });
+
+  return {
+    lineItemId,
+    result
+  };
+}
+
 function detectMode(idtoken, req) {
   const text = [
     idtoken?.platformContext?.resource?.title,
@@ -197,7 +233,7 @@ function renderQuiz(ltik, mode, questions) {
   const payload = encodeURIComponent(JSON.stringify(questions));
   const questionHtml = questions.map(q => `<section><b>${q.number}. ${escapeHtml(config.label)}</b><p>${escapeHtml(q.prompt)}</p>${q.options.map(o => `<label style="display:block;padding:8px"><input type="radio" name="q${q.number}" value="${escapeHtml(o)}"> ${escapeHtml(o)}</label>`).join("")}</section>`).join("");
 
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(config.label)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}section{border:1px solid #ddd;border-radius:10px;padding:16px;margin:14px 0}button{padding:12px 22px;font-size:16px}.submit-bar{position:sticky;bottom:12px;background:#fff;border:1px solid #ccc;border-radius:10px;padding:12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:10}.submit-bar button{width:min(100%,360px);font-weight:bold}.notice{background:#eef6ff;border:1px solid #9cc8f5;padding:12px;border-radius:8px}</style></head><body><h1>TOEFL Junior List 1 · ${escapeHtml(config.label)}</h1><p>${config.count} 题，满分 100 分。</p><p class="notice">${escapeHtml(config.description)}提交前如果有未答题，系统会提示你。</p><form id="quiz"><input type="hidden" name="questions" value="${payload}">${questionHtml}<div class="submit-bar"><button type="submit">提交并评分</button></div></form><script>const form=document.getElementById('quiz');form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const questions=JSON.parse(decodeURIComponent(fd.get('questions')));const answers=questions.map(q=>fd.get('q'+q.number));const unanswered=answers.filter(a=>!a).length;if(unanswered>0){const ok=confirm('还有 '+unanswered+' 道题未作答。\\n\\n确定仍然提交吗？');if(!ok)return;}const r=await fetch('/submit-quiz?ltik=${encodeURIComponent(ltik)}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'${mode}',questions,answers})});document.body.innerHTML=await r.text();});</script></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(config.label)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}section{border:1px solid #ddd;border-radius:10px;padding:16px;margin:14px 0}button{padding:12px 22px;font-size:16px}.submit-bar{position:sticky;bottom:12px;background:#fff;border:1px solid #ccc;border-radius:10px;padding:12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:10}.submit-bar button{width:min(100%,360px);font-weight:bold}.notice{background:#eef6ff;border:1px solid #9cc8f5;padding:12px;border-radius:8px}</style></head><body><h1>TOEFL Junior List 1 · ${questions[0]?.item?.list || ""} · ${escapeHtml(config.label)}</h1><p>${config.count} 题，满分 100 分。</p><p class="notice">${escapeHtml(config.description)}提交前如果有未答题，系统会提示你。</p><form id="quiz"><input type="hidden" name="questions" value="${payload}">${questionHtml}<div class="submit-bar"><button type="submit">提交并评分</button></div></form><script>const form=document.getElementById('quiz');form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const questions=JSON.parse(decodeURIComponent(fd.get('questions')));const answers=questions.map(q=>fd.get('q'+q.number));const unanswered=answers.filter(a=>!a).length;if(unanswered>0){const ok=confirm('还有 '+unanswered+' 道题未作答。\\n\\n确定仍然提交吗？');if(!ok)return;}const r=await fetch('/submit-quiz?ltik=${encodeURIComponent(ltik)}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'${mode}',questions,answers})});document.body.innerHTML=await r.text();});</script></body></html>`;
 }
 
 lti.app.use((req, res, next) => {
