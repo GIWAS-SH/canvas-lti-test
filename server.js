@@ -419,6 +419,13 @@ lti.app.post("/submit-quiz", async (req, res) => {
 
   return n + (answer === q.correct ? 1 : 0);
 }, 0);
+
+const unansweredCount = answers.filter(answer => {
+  return !String(answer ?? "").trim();
+}).length;
+
+const wrongCount = questions.length - correctCount - unansweredCount;
+    
     const percent = Math.round(correctCount / questions.length * 100);
     console.log("[QUIZ]", MODES[mode].label, correctCount + "/" + questions.length, "=", percent);
     const listNumber = Number(
@@ -475,8 +482,13 @@ const right = mode === "spelling"
     </head>
     <body>
       <h1>测试完成</h1>
-      <h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2>
-      <p class="success">成绩已成功提交到 Canvas Gradebook。</p>
+<h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2>
+<p>
+  正确：${correctCount}　
+  错误：${wrongCount}　
+  未作答：${unansweredCount}
+</p>
+<p class="success">成绩已成功提交到 Canvas Gradebook。</p>
       <h2>答题反馈</h2>
       ${feedback}
     </body>
