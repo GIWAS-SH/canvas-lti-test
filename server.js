@@ -396,7 +396,7 @@ lti.app.get("/quiz", (req, res) => {
   );
 });
 
-lti.app.get("/audio/l1/:fileId", async (req, res) => {
+app.get("/audio/l1/:fileId", async (req, res) => {
   try {
     const fileId = Number(req.params.fileId);
 
