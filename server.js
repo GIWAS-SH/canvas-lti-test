@@ -396,7 +396,9 @@ lti.app.get("/quiz", (req, res) => {
   );
 });
 
-app.get("/audio/l1/:fileId", async (req, res) => {
+lti.whitelist(new RegExp(/^\/audio\/l1\/\d+$/));
+
+lti.app.get("/audio/l1/:fileId", async (req, res) => {
   try {
     const fileId = Number(req.params.fileId);
 
