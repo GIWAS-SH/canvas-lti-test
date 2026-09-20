@@ -395,6 +395,49 @@ lti.app.get("/quiz", (req, res) => {
     )
   );
 });
+
+lti.app.get("/audio/l1/:fileId", async (req, res) => {
+  try {
+    const fileId = Number(req.params.fileId);
+
+    if (!Number.isInteger(fileId)) {
+      return res.status(400).send("Invalid file ID");
+    }
+
+    const canvasUrl =
+      `https://wisdomhouseacademy.instructure.com/courses/958/files/${fileId}/download`;
+
+    const response = await fetch(canvasUrl, {
+      headers: {
+        Authorization: `Bearer ${process.env.CANVAS_API_TOKEN}`
+      },
+      redirect: "follow"
+    });
+
+    if (!response.ok) {
+      return res
+        .status(response.status)
+        .send(`Canvas audio request failed: ${response.status}`);
+    }
+
+    res.setHeader(
+      "Content-Type",
+      response.headers.get("content-type") || "audio/mpeg"
+    );
+
+    if (!response.body) {
+      return res.status(500).send("Audio response has no body");
+    }
+
+    const { Readable } = await import("node:stream");
+    Readable.fromWeb(response.body).pipe(res);
+
+  } catch (error) {
+    console.error("L1 audio proxy error:", error);
+    res.status(500).send("Audio proxy error");
+  }
+});
+
 lti.app.get("/quiz/start", (req, res) => res.redirect("/quiz"));
 
 lti.app.post("/submit-quiz", async (req, res) => {
