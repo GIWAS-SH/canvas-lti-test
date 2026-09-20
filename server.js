@@ -13,6 +13,10 @@ if (!Array.isArray(QUESTION_BANK) || QUESTION_BANK.length === 0) {
   throw new Error("question_bank.json 中没有找到有效的 words 题库数组");
 }
 
+const L1_AUDIO_MAP = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "L1_audio_map.json"), "utf8")
+);
+
 lti.setup(LTI_ENCRYPTION_KEY, { url: MONGODB_URI }, {
   appRoute: "/lti/launch",
   loginRoute: "/lti/login",
@@ -37,11 +41,22 @@ function shuffle(array) {
   }
   return a;
 }
+function parseListNumber(value) {
+  const text = String(value ?? "").trim();
+
+  if (/^\d+$/.test(text)) {
+    return Number(text);
+  }
+
+  const match = text.match(/(?:^|\()L?(\d+)\)?$/i);
+  return match ? Number(match[1]) : NaN;
+}
 
 const MODES = {
   enToZh: { label: "英译中", count: 50, description: "看英文，选择正确的中文释义。" },
   zhToEn: { label: "中译英", count: 50, description: "看中文，选择正确的英文单词。" },
-  context: { label: "语境题", count: 20, description: "根据句子语境，选择最合适的单词。" }
+  context: { label: "语境题", count: 40, description: "根据句子语境，选择最合适的单词。" },
+  spelling: { label: "听写题", count: 50, description: "听音频，输入正确的英文单词。" }
 };
 
 function makeQuestions(mode, listNumber) {
@@ -79,13 +94,43 @@ function makeQuestions(mode, listNumber) {
     }
   }
 
+if (mode === "spelling") {
+  const missingWord = listQuestions.filter(item => {
+    return !item.word;
+  });
+
+  if (missingWord.length > 0) {
+    throw new Error(
+      `List ${targetList} 还有 ${missingWord.length} 个单词缺少拼写数据。`
+    );
+  }
+}
+  
   const selected = shuffle(listQuestions).slice(
     0,
     Math.min(config.count, listQuestions.length)
   );
 
   return selected.map((item, index) => {
-    const distractors = shuffle(
+  
+ if (mode === "spelling") {
+  const audio = L1_AUDIO_MAP[String(item.word || "").trim().toLowerCase()];
+
+  return {
+    number: index + 1,
+    id: item.id,
+    mode,
+    prompt: "",
+    options: [],
+    correct: item.word,
+    item: {
+      ...item,
+      audioUrl: audio?.url || ""
+    }
+  };
+}
+
+  const distractors = shuffle(
       listQuestions.filter(x => x.id !== item.id)
     ).slice(0, 3);
 
@@ -251,6 +296,7 @@ function detectMode(idtoken, req) {
   ].filter(Boolean).join(" ").toLowerCase();
   if (text.includes("中译英") || text.includes("中文到英文") || text.includes("zh-to-en")) return "zhToEn";
   if (text.includes("语境") || text.includes("context")) return "context";
+  if (text.includes("听写题") || text.includes("spelling")) return "spelling";
   if (text.includes("英译中") || text.includes("英文到中文") || text.includes("en-to-zh")) return "enToZh";
   return null;
 }
@@ -275,8 +321,40 @@ function detectListNumber(idtoken, req) {
 function renderQuiz(ltik, mode, questions) {
   const config = MODES[mode];
   const payload = encodeURIComponent(JSON.stringify(questions));
-  const questionHtml = questions.map(q => `<section><b>${q.number}. ${escapeHtml(config.label)}</b><p>${escapeHtml(q.prompt)}</p>${q.options.map(o => `<label style="display:block;padding:8px"><input type="radio" name="q${q.number}" value="${escapeHtml(o)}"> ${escapeHtml(o)}</label>`).join("")}</section>`).join("");
+const questionHtml = questions.map(q => {
+  if (mode === "spelling") {
+    const audioUrl = q.item?.audioUrl || "";
 
+    return `
+      <section>
+        <b>${q.number}. ${escapeHtml(config.label)}</b>
+        <div style="margin:12px 0">
+          <audio controls preload="none" src="${escapeHtml(audioUrl)}"></audio>
+        </div>
+        <input
+          type="text"
+          name="q${q.number}"
+          autocomplete="off"
+          style="width:100%;max-width:420px;padding:10px;font-size:18px;box-sizing:border-box"
+          placeholder="请输入你听到的单词"
+        >
+      </section>
+    `;
+  }
+
+  return `
+    <section>
+      <b>${q.number}. ${escapeHtml(config.label)}</b>
+      <p>${escapeHtml(q.prompt)}</p>
+      ${q.options.map(o =>
+        `<label style="display:block;padding:8px">
+          <input type="radio" name="q${q.number}" value="${escapeHtml(o)}">
+          ${escapeHtml(o)}
+        </label>`
+      ).join("")}
+    </section>
+  `;
+}).join("");
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(config.label)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}section{border:1px solid #ddd;border-radius:10px;padding:16px;margin:14px 0}button{padding:12px 22px;font-size:16px}.submit-bar{position:sticky;bottom:12px;background:#fff;border:1px solid #ccc;border-radius:10px;padding:12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:10}.submit-bar button{width:min(100%,360px);font-weight:bold}.notice{background:#eef6ff;border:1px solid #9cc8f5;padding:12px;border-radius:8px}</style></head><body><h1>TOEFL Junior List ${escapeHtml(String(questions[0]?.item?.list || ""))} · ${escapeHtml(config.label)}</h1><p>${config.count} 题，满分 100 分。</p><p class="notice">${escapeHtml(config.description)}提交前如果有未答题，系统会提示你。</p><form id="quiz"><input type="hidden" name="questions" value="${payload}">${questionHtml}<div class="submit-bar"><button type="submit">提交并评分</button></div></form><script>const form=document.getElementById('quiz');form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const questions=JSON.parse(decodeURIComponent(fd.get('questions')));const answers=questions.map(q=>fd.get('q'+q.number));const unanswered=answers.filter(a=>!a).length;if(unanswered>0){const ok=confirm('还有 '+unanswered+' 道题未作答。\\n\\n确定仍然提交吗？');if(!ok)return;}const r=await fetch('/submit-quiz?ltik=${encodeURIComponent(ltik)}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'${mode}',questions,answers})});document.body.innerHTML=await r.text();});</script></body></html>`;
 }
 
@@ -326,7 +404,21 @@ lti.app.post("/submit-quiz", async (req, res) => {
     if (!MODES[mode]) throw new Error("没有收到有效的测试类型");
     if (!Array.isArray(questions) || !Array.isArray(answers) || questions.length === 0) throw new Error("没有收到有效的题目或答案");
 
-    const correctCount = questions.reduce((n, q, i) => n + (answers[i] === q.correct ? 1 : 0), 0);
+    const correctCount = questions.reduce((n, q, i) => {
+  const answer = String(answers[i] ?? "").trim();
+
+  if (mode === "spelling") {
+    const correct = String(q.correct ?? "").trim();
+
+    return n + (
+      answer.toLowerCase() === correct.toLowerCase()
+        ? 1
+        : 0
+    );
+  }
+
+  return n + (answer === q.correct ? 1 : 0);
+}, 0);
     const percent = Math.round(correctCount / questions.length * 100);
     console.log("[QUIZ]", MODES[mode].label, correctCount + "/" + questions.length, "=", percent);
     const listNumber = Number(
@@ -345,7 +437,12 @@ const submitted = await submitCanvasGrade(
 );
 
     const feedback = questions.map((q, i) => {
-      const right = answers[i] === q.correct;
+      const answer = String(answers[i] ?? "").trim();
+const correct = String(q.correct ?? "").trim();
+
+const right = mode === "spelling"
+  ? answer.toLowerCase() === correct.toLowerCase()
+  : answer === q.correct;
       return `<div style="border:1px solid ${right ? '#9c9' : '#e99'};background:${right ? '#f5fff5' : '#fff5f5'};border-radius:8px;padding:12px;margin:10px 0"><b>${q.number}. ${escapeHtml(q.prompt)}</b><p>你的答案：${escapeHtml(answers[i] || "未作答")}</p><p>正确答案：${escapeHtml(q.correct)}</p><p>中文释义：${escapeHtml(q.item.meaning)}</p>${q.item.contextFull ? `<p>完整句：${escapeHtml(q.item.contextFull)}</p>` : ""}</div>`;
     }).join("");
 
