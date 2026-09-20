@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOEFL Junior List 1 - 听音拼写测试</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Microsoft YaHei",sans-serif;background:#f5f7fb;color:#202124}
+.container{max-width:1200px;margin:0 auto;padding:28px 20px 55px}
+h1{font-size:28px;margin:0 0 7px}
+.subtitle{color:#666;margin-bottom:18px}
+.top{background:#fff;border-radius:14px;padding:16px 20px;box-shadow:0 2px 12px rgba(0,0,0,.07);position:sticky;top:10px;z-index:5}
+.topline{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+.progress{height:9px;background:#e9edf3;border-radius:99px;overflow:hidden;margin-top:12px}
+.progressBar{height:100%;width:0;background:#4b74ff;transition:.2s}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:18px}
+.card{background:#fff;border-radius:13px;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,.06);min-width:0}
+.card.unanswered{border:2px solid #e1e5eb}
+.card.answered{border:2px solid #b8c8ff}
+.num{font-size:13px;color:#777;margin-bottom:9px}
+.audioBtn{width:100%;border:0;border-radius:9px;padding:10px 8px;background:#eef3ff;color:#2454d8;font-weight:700;cursor:pointer;font-size:14px}
+.input{width:100%;margin-top:10px;font-size:17px;padding:10px;border:2px solid #d9dde5;border-radius:9px;outline:none}
+.input:focus{border-color:#4b74ff}
+.footer{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-top:18px;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.primary{border:0;border-radius:10px;padding:12px 22px;background:#2454d8;color:white;font-size:15px;font-weight:700;cursor:pointer}
+.secondary{border:0;border-radius:10px;padding:10px 16px;background:#eef0f4;color:#333;cursor:pointer}
+.muted{color:#777;font-size:14px}
+.warning{color:#8a5600;background:#fff7e6;border-radius:10px;padding:10px 12px;margin-top:12px;font-size:14px}
+.result{text-align:center;background:#fff;border-radius:16px;padding:35px;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-top:20px}
+.score{font-size:52px;font-weight:800;margin:10px 0}
+.hidden{display:none}
+@media(max-width:900px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:650px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.container{padding:20px 12px}}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>TOEFL Junior List 1 - 听音拼写</h1>
+<div class="subtitle">测试版：从 L1 的全部 65 个单词中随机抽取 50 题；所有题目同时显示，可暂时留空。</div>
+
+<div id="testArea">
+  <div class="top">
+    <div class="topline">
+      <strong id="answeredText">已作答：0 / 50</strong>
+      <span class="muted">每题 2 分，共 100 分</span>
+    </div>
+    <div class="progress"><div id="progressBar" class="progressBar"></div></div>
+  </div>
+
+  <div id="grid" class="grid"></div>
+
+  <div class="footer">
+    <div class="muted">不会的题可以先空着，之后再回来播放音频并填写。</div>
+    <div>
+      <button class="secondary" id="restartBtn">重新随机50题</button>
+      <button class="primary" id="submitBtn">提交测试</button>
+    </div>
+  </div>
+</div>
+
+<div id="resultArea" class="result hidden">
+  <div>测试完成</div>
+  <div class="score" id="score">0 / 100</div>
+  <div id="resultDetail"></div>
+  <button class="primary" id="againBtn">重新开始（重新随机50题）</button>
+</div>
+</div>
+
+<script>
+const WORDS = [{"word": "abandon", "phonetic": "[əˈbændən]", "meaning": "vt.放弃；弃绝；对…绝望；对…断念"}, {"word": "abnormal", "phonetic": "[æbˈnɔːm(ə)l $ -ˈnɔːr-]", "meaning": "adj.反常的，异常的；变态的"}, {"word": "aboard", "phonetic": "[əˈbɔːd $ əˈbɔːrd]", "meaning": "adv.在飞机上；在船上；在火车上prep.在(飞机、 船或火车)上"}, {"word": "abolish", "phonetic": "[əˈbɒlɪʃ $ əˈbɑː-]", "meaning": "vt.废除，废止"}, {"word": "abrupt", "phonetic": "[əˈbrʌpt]", "meaning": "adj.突然的，意外的；(言语、行为)粗鲁的，唐突的"}, {"word": "absolute", "phonetic": "[ˈæbsəluːt]", "meaning": "adj.绝对的，完全的"}, {"word": "absorb", "phonetic": "[əbˈsɔːb, əbˈzɔːb $ -ɔːrb]", "meaning": "vt.吸收；吸引…的注意力"}, {"word": "abstract", "phonetic": "[<a./n.>ˈæbstrækt <v.>əbˈstrækt, æb-]", "meaning": "adj.抽象的；理论上的 n.摘要"}, {"word": "absurd", "phonetic": "[əbˈsɜːd, -ˈzɜːd $ -ɜːrd]", "meaning": "adj.荒谬的，荒唐的"}, {"word": "abundant", "phonetic": "[əˈbʌndənt]", "meaning": "adj.大量的，充足的"}, {"word": "academic", "phonetic": "[ˌækəˈdemɪk◂]", "meaning": "adj.学校的，学院的；学术性的"}, {"word": "accept", "phonetic": "[əkˈsept]", "meaning": "vt./vi.接受"}, {"word": "acceptable", "phonetic": "[əkˈseptəb(ə)l]", "meaning": "adj.可以接受的"}, {"word": "access", "phonetic": "[ˈækses]", "meaning": "n.通道，入口；接近或取得…的方法或权利等"}, {"word": "accommodation", "phonetic": "[əˌkɒməˈdeɪʃ(ə)n $ əˌkɑː-]", "meaning": "n.(尤指仅供短期使用的)住处"}, {"word": "accompany", "phonetic": "[əˈkʌmp(ə)ni]", "meaning": "vt.陪伴，陪同；伴随"}, {"word": "accomplish", "phonetic": "[əˈkʌmplɪʃ $ əˈkɑːm-, əˈkʌm-]", "meaning": "n.完成(任务、使命、计划等)；实现；达到"}, {"word": "according", "phonetic": "[əˈkɔːdɪŋ]", "meaning": "adj.相符的，一致的，根据…而定的"}, {"word": "account", "phonetic": "[əˈkaʊnt]", "meaning": "n.账户；账目，账单；解释，理由 vi.解释；报账 vt.认为；把…视为"}, {"word": "accountant", "phonetic": "[əˈkaʊnt(ə)nt]", "meaning": "n.会计人员，会计师"}, {"word": "accumulate", "phonetic": "[əˈkjuːmjəleɪt, əˈkjuːmjʊleɪt]", "meaning": "vt./vi.积累.堆积"}, {"word": "accurate", "phonetic": "[ˈækjərət, ˈækjʊrət]", "meaning": "adj.精确的"}, {"word": "accuse", "phonetic": "[əˈkjuːz]", "meaning": "vt.指责，谴责；控告"}, {"word": "accustom", "phonetic": "[əˈkʌstəm]", "meaning": "vt.使习惯于"}, {"word": "achieve", "phonetic": "[əˈtʃiːv]", "meaning": "vt.取得，获得；实现，达成"}, {"word": "acknowledge", "phonetic": "[əkˈnɒlɪdʒ $ -ˈnɑː-]", "meaning": "vt.承认；感谢，鸣谢"}, {"word": "acquaintance", "phonetic": "[əˈkweɪnt(ə)ns]", "meaning": "n.相识的人，熟人；相识"}, {"word": "acquire", "phonetic": "[əˈkwaɪə $ əˈkwaɪr]", "meaning": "n.获得，得到"}, {"word": "act", "phonetic": "[ækt]", "meaning": "vt./vi.行动；做；表演；起作用 n.行为，行动；(戏剧中的)幕"}, {"word": "active", "phonetic": "[ˈæktɪv]", "meaning": "adj.活泼的，活跃的；积极的；[语]主动的"}, {"word": "actual", "phonetic": "[ˈæktʃuəl]", "meaning": "adj.实际的，事实的，现实的，真实的"}, {"word": "adapt", "phonetic": "[əˈdæpt]", "meaning": "vt./vi.(使)适应，(使)适合；改编，改写"}, {"word": "adjust", "phonetic": "[əˈdʒʌst]", "meaning": "vt./vi.改变…以适应；调整；校正"}, {"word": "administrate", "phonetic": "[ədˌmɪnəˈstreɪt, ədˌmɪnɪˈstreɪt]", "meaning": "vt.管理，经营；实施"}, {"word": "admire", "phonetic": "[ədˈmaɪə $ -ˈmaɪr]", "meaning": "n.赞赏；钦佩"}, {"word": "admit", "phonetic": "[ədˈmɪt]", "meaning": "vt./vi.许可…进入；承认；供认"}, {"word": "adopt", "phonetic": "[əˈdɒpt $ əˈdɑːpt]", "meaning": "vt.收养；采取，采纳"}, {"word": "adore", "phonetic": "[əˈdɔː $ əˈdɔːr]", "meaning": "n.爱慕，崇拜"}, {"word": "adult", "phonetic": "[ˈædʌlt, əˈdʌlt]", "meaning": "n.成年人"}, {"word": "advance", "phonetic": "[ədˈvɑːns $ ədˈvæns]", "meaning": "vt./vi.(使)前进，(使)发展 n.前进，发展；改进，进步"}, {"word": "advantage", "phonetic": "[ədˈvɑːntɪdʒ $ ədˈvæn-]", "meaning": "n.有利条件，优势"}, {"word": "adventure", "phonetic": "[ədˈventʃə $ -ər]", "meaning": "n.冒险"}, {"word": "advertise", "phonetic": "[ˈædvətaɪz $ -ər-]", "meaning": "vt./vi.(给…)做广告宣传"}, {"word": "advise", "phonetic": "[ədˈvaɪz]", "meaning": "vt./vi.劝告；提建议"}, {"word": "advice", "phonetic": "[ədˈvaɪs]", "meaning": "n.意见，建议"}, {"word": "advocate", "phonetic": "[<v.>ˈædvəkeɪt <n.>ˈædvəkət, ˈædvəkɪt, -keɪt]", "meaning": "vt.提倡，主张 n.提倡者，拥护者"}, {"word": "afraid", "phonetic": "[əˈfreɪd]", "meaning": "adj.害怕的，恐惧的"}, {"word": "Africa", "phonetic": "[ˈæfrɪkə]", "meaning": "n.非洲"}, {"word": "agency", "phonetic": "[ˈeɪdʒ(ə)nsi]", "meaning": "n.经销处；代理行，代理机构"}, {"word": "aggressive", "phonetic": "[əˈɡresɪv]", "meaning": "adj.好争斗的，挑衅的；侵略性的；有干劲儿的，积极进取的"}, {"word": "agile", "phonetic": "[ˈædʒaɪl $ ˈædʒ(ə)l]", "meaning": "adj.灵巧的；轻快的；机敏的"}, {"word": "agriculture", "phonetic": "[ˈæɡrɪˌkʌltʃə $ -ər]", "meaning": "n.农业"}, {"word": "album", "phonetic": "[ˈælbəm]", "meaning": "n.唱片；粘贴薄，集邮簿；相册，影集"}, {"word": "alcohol", "phonetic": "[ˈælkəhɒl $ -hɒːl]", "meaning": "n.酒精，酒"}, {"word": "alert", "phonetic": "[əˈlɜːt $ -ɜːrt]", "meaning": "adj.警觉的，警惕的；注意的 vt.使警觉；向…报警"}, {"word": "algae", "phonetic": "[ˈældʒiː, -ɡiː]", "meaning": "n.藻类；海藻"}, {"word": "Algebra", "phonetic": "[ˈældʒəbrə, ˈældʒɪbrə]", "meaning": "n.代数学，代数"}, {"word": "alien", "phonetic": "[ˈeɪliən]", "meaning": "adj.外国的 n.外国人；外星人"}, {"word": "allergy", "phonetic": "[ˈælədʒi $ -ər-]", "meaning": "n.(由食物、花粉、虫咬引起的)过敏症"}, {"word": "alliance", "phonetic": "[əˈlaɪəns]", "meaning": "n.(国家、政党等的)结盟，同盟，联盟；同盟条约；联姻"}, {"word": "allocate", "phonetic": "[ˈæləkeɪt]", "meaning": "n.分配，分派；把…拨给"}, {"word": "allow", "phonetic": "[əˈlaʊ]", "meaning": "n.允许，许可"}, {"word": "allowance", "phonetic": "[əˈlaʊəns]", "meaning": "n.允许；津贴，补助"}, {"word": "alpha", "phonetic": "[ˈælfə]", "meaning": "n.希腊字母表的第一个字母，即α"}, {"word": "alphabet", "phonetic": "[ˈælfəbet]", "meaning": "n.字母表"}];
+const AUDIO_MAP_URL = "L1_audio_map.json";
+let audioMap = {};
+let questions = [];
+let answers = [];
+
+const $ = id => document.getElementById(id);
+
+function shuffle(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function normalize(s){return String(s||"").trim().toLowerCase();}
+function audioUrlFor(word){
+  return audioMap[String(word).toLowerCase()]?.url || "";
+}
+function updateProgress(){
+  const n=answers.filter(x=>String(x||"").trim()!=="").length;
+  $("answeredText").textContent=`已作答：${n} / 50`;
+  $("progressBar").style.width=`${n/50*100}%`;
+}
+function playAudio(word, btn){
+  const url=audioUrlFor(word);
+  if(!url){btn.textContent="❌ 无音频";return;}
+  const audio=new Audio(url);
+  btn.textContent="🔊 播放中";
+  audio.onended=()=>btn.textContent="🔊 播放发音";
+  audio.onerror=()=>btn.textContent="❌ 播放失败";
+  audio.play().catch(()=>btn.textContent="❌ 点击重试");
+}
+function render(){
+  const grid=$("grid");
+  grid.innerHTML="";
+  questions.forEach((q,i)=>{
+    const card=document.createElement("div");
+    card.className="card unanswered";
+    card.id=`card-${i}`;
+    card.innerHTML=`
+      <div class="num">第 ${i+1} 题</div>
+      <button class="audioBtn" type="button">🔊 播放发音</button>
+      <input class="input" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="输入英文单词">
+    `;
+    const btn=card.querySelector(".audioBtn");
+    const input=card.querySelector(".input");
+    btn.addEventListener("click",()=>playAudio(q.word,btn));
+    input.value=answers[i]||"";
+    input.addEventListener("input",()=>{
+      answers[i]=input.value;
+      card.classList.toggle("answered",normalize(input.value)!=="");
+      card.classList.toggle("unanswered",normalize(input.value)==="");
+      updateProgress();
+    });
+    grid.appendChild(card);
+  });
+  updateProgress();
+}
+function startTest(){
+  questions=shuffle(WORDS).slice(0,50);
+  answers=new Array(50).fill("");
+  $("resultArea").classList.add("hidden");
+  $("testArea").classList.remove("hidden");
+  render();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function finish(){
+  let correct=0, wrong=0, blank=0;
+  questions.forEach((q,i)=>{
+    const a=normalize(answers[i]);
+    if(!a) blank++;
+    else if(a===normalize(q.word)) correct++;
+    else wrong++;
+  });
+  const score=correct*2;
+  $("testArea").classList.add("hidden");
+  $("resultArea").classList.remove("hidden");
+  $("score").textContent=`${score} / 100`;
+  $("resultDetail").innerHTML=`50题中：<strong>${correct}</strong> 题正确，<strong>${wrong}</strong> 题错误，<strong>${blank}</strong> 题未作答。`;
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("submitBtn").addEventListener("click",()=>{
+  if(confirm("确定提交测试吗？未填写的题目将计为未作答，并得 0 分。")){
+    finish();
+  }
+});
+$("restartBtn").addEventListener("click",()=>{
+  if(confirm("重新开始会放弃当前答案，并重新随机抽取50题。确定吗？")) startTest();
+});
+$("againBtn").addEventListener("click",startTest);
+
+(async function(){
+  try{
+    const res=await fetch(AUDIO_MAP_URL,{cache:"no-store"});
+    if(!res.ok) throw new Error("无法读取 L1_audio_map.json");
+    audioMap=await res.json();
+    const missing=WORDS.filter(x=>!audioUrlFor(x.word));
+    if(missing.length){
+      document.querySelector(".subtitle").insertAdjacentHTML("afterend",
+        `<div class="warning">音频检查发现 ${missing.length} 个单词没有对应音频。</div>`);
+    }
+    startTest();
+  }catch(e){
+    document.querySelector(".subtitle").insertAdjacentHTML("afterend",
+      `<div class="warning">${e.message}</div>`);
+  }
+})();
+</script>
+</body>
+</html>
