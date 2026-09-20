@@ -125,7 +125,7 @@ if (mode === "spelling") {
     correct: item.word,
     item: {
       ...item,
-      audioUrl: audio?.url || ""
+      audioUrl: audio?.fileId ? `/audio/l1/${audio.fileId}` : ""
     }
   };
 }
