@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOEFL Junior Vocabulary Flashcards · L1 Audio Test</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      font-family: Arial, "Microsoft YaHei", sans-serif;
+      background: #f4f6f8; color: #202124;
+    }
+    .container { width: 100%; max-width: 760px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 24px; }
+    .controls { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px; }
+    select, button {
+      padding:10px 14px; border:1px solid #c7cdd4; border-radius:8px;
+      background:white; font-size:15px; cursor:pointer;
+    }
+    button:hover { background:#eef3f8; }
+    .progress { margin-bottom:12px; text-align:center; color:#5f6368; }
+    .card-area { perspective:1000px; margin-bottom:20px; }
+    .flashcard {
+      width:100%; min-height:320px; position:relative;
+      transform-style:preserve-3d; transition:transform .5s; cursor:pointer;
+    }
+    .flashcard.flipped { transform:rotateY(180deg); }
+    .card-face {
+      position:absolute; inset:0; min-height:320px;
+      display:flex; flex-direction:column; justify-content:center; align-items:center;
+      padding:30px; border-radius:18px; background:white;
+      border:1px solid #dfe3e8; box-shadow:0 5px 18px rgba(0,0,0,.08);
+      backface-visibility:hidden; text-align:center;
+    }
+    .card-back { transform:rotateY(180deg); background:#f8fbff; }
+    .word { font-size:42px; font-weight:bold; margin-bottom:18px; word-break:break-word; }
+    .card-back .word { font-size:36px; }
+    .phonetic { font-size:20px; color:#5f6368; margin-bottom:16px; }
+    .meaning { font-size:28px; font-weight:bold; margin-bottom:20px; word-break:break-word; }
+    .list-label { color:#5f6368; font-size:16px; }
+    .hint { color:#80868b; font-size:14px; }
+    .audio-button {
+      margin-top:10px; padding:9px 16px; font-size:15px;
+      border:1px solid #c7cdd4; border-radius:8px; background:#fff; cursor:pointer;
+    }
+    .audio-status { min-height:20px; margin-top:7px; font-size:13px; color:#5f6368; }
+    .navigation { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+    .message { text-align:center; padding:20px; color:#5f6368; }
+    .audit {
+      margin:20px 0; padding:14px; background:#fff; border:1px solid #dfe3e8;
+      border-radius:12px; line-height:1.6;
+    }
+    .audit button { margin-top:8px; }
+    @media (max-width:500px) {
+      body { padding:14px; }
+      .word { font-size:32px; }
+      .meaning { font-size:23px; }
+      .card-face, .flashcard { min-height:280px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>TOEFL Junior Vocabulary Flashcards</h1>
+
+  <div class="controls">
+    <select id="listSelect">
+      <option value="L1">(L1) List 1</option>
+    </select>
+    <select id="modeSelect">
+      <option value="en-zh">英译中</option>
+      <option value="zh-en">中译英</option>
+    </select>
+    <button id="shuffleButton">随机排序</button>
+    <button id="restartButton">重新开始</button>
+  </div>
+
+  <div class="audit" id="audit">
+    正在检查 L1 音频映射……
+  </div>
+
+  <div class="progress" id="progress">正在读取词汇……</div>
+
+  <div class="card-area">
+    <div class="flashcard" id="flashcard">
+      <div class="card-face card-front">
+        <div class="word" id="frontWord"></div>
+        <div class="phonetic" id="frontPhonetic"></div>
+        <button class="audio-button" id="frontAudioButton" type="button">🔊 播放发音</button>
+        <div class="audio-status" id="frontAudioStatus"></div>
+        <div class="hint" id="frontHint">点击卡片查看中文意思</div>
+      </div>
+
+      <div class="card-face card-back">
+        <div class="meaning" id="backMeaning"></div>
+        <div class="word" id="backWord"></div>
+        <div class="phonetic" id="backPhonetic"></div>
+        <div class="list-label" id="backList"></div>
+        <button class="audio-button" id="backAudioButton" type="button">🔊 播放发音</button>
+        <div class="audio-status" id="backAudioStatus"></div>
+        <div class="hint" id="backHint">点击卡片返回英文</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="navigation">
+    <button id="previousButton">上一张</button>
+    <button id="nextButton">下一张</button>
+  </div>
+
+  <div class="message" id="message"></div>
+</div>
+
+<script>
+  let allWords = [];
+  let currentWords = [];
+  let currentIndex = 0;
+  let audioMap = {};
+
+  const listSelect = document.getElementById("listSelect");
+  const flashcard = document.getElementById("flashcard");
+  const modeSelect = document.getElementById("modeSelect");
+  const frontWord = document.getElementById("frontWord");
+  const frontPhonetic = document.getElementById("frontPhonetic");
+  const backMeaning = document.getElementById("backMeaning");
+  const backWord = document.getElementById("backWord");
+  const backPhonetic = document.getElementById("backPhonetic");
+  const backList = document.getElementById("backList");
+  const frontHint = document.getElementById("frontHint");
+  const backHint = document.getElementById("backHint");
+  const frontAudioButton = document.getElementById("frontAudioButton");
+  const backAudioButton = document.getElementById("backAudioButton");
+  const frontAudioStatus = document.getElementById("frontAudioStatus");
+  const backAudioStatus = document.getElementById("backAudioStatus");
+  const progress = document.getElementById("progress");
+  const message = document.getElementById("message");
+  const audit = document.getElementById("audit");
+
+  function normalizeWord(word) {
+    return String(word || "").trim().toLowerCase();
+  }
+
+  async function loadData() {
+    try {
+      const [wordsResponse, audioResponse] = await Promise.all([
+        fetch("question_bank.json"),
+        fetch("L1_audio_map.json")
+      ]);
+
+      if (!wordsResponse.ok) throw new Error("无法读取 question_bank.json");
+      if (!audioResponse.ok) throw new Error("无法读取 L1_audio_map.json");
+
+      const data = await wordsResponse.json();
+      audioMap = await audioResponse.json();
+
+      if (!Array.isArray(data)) throw new Error("question_bank.json 不是数组格式");
+
+      allWords = data.filter(item => item && item.word && item.meaning);
+      currentWords = allWords.filter(item => item.list === "(L1)");
+
+      runAudioAudit();
+      shuffleCurrentWords();
+      showCard();
+      message.textContent = "";
+    } catch (error) {
+      console.error(error);
+      progress.textContent = "读取失败";
+      message.textContent = error.message;
+      audit.textContent = "❌ " + error.message;
+    }
+  }
+
+  function runAudioAudit() {
+    const missing = currentWords.filter(item => !audioMap[normalizeWord(item.word)]);
+    const found = currentWords.length - missing.length;
+
+    if (missing.length === 0) {
+      audit.innerHTML =
+        "✅ <strong>L1 音频检查：65 / 65</strong><br>" +
+        "所有 L1 单词都有对应音频。现在可以逐个试听。";
+    } else {
+      audit.innerHTML =
+        "⚠️ <strong>L1 音频检查：" + found + " / " + currentWords.length + "</strong><br>" +
+        "缺少音频：" + missing.map(x => x.word).join(", ");
+    }
+  }
+
+  function shuffleCurrentWords() {
+    for (let i = currentWords.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [currentWords[i], currentWords[j]] = [currentWords[j], currentWords[i]];
+    }
+  }
+
+  function playWordAudio(word, statusElement) {
+    const entry = audioMap[normalizeWord(word)];
+    if (!entry || !entry.url) {
+      statusElement.textContent = "⚠️ 找不到该词的音频";
+      return;
+    }
+
+    statusElement.textContent = "正在播放……";
+
+    const audio = new Audio(entry.url);
+    audio.preload = "auto";
+    audio.onended = () => { statusElement.textContent = ""; };
+    audio.onerror = () => {
+      statusElement.textContent = "❌ 音频加载/播放失败";
+    };
+
+    audio.play().catch(error => {
+      console.error(error);
+      statusElement.textContent = "❌ 浏览器阻止了播放";
+    });
+  }
+
+  function showCard() {
+    flashcard.classList.remove("flipped");
+    frontAudioStatus.textContent = "";
+    backAudioStatus.textContent = "";
+
+    if (currentWords.length === 0) {
+      progress.textContent = "没有找到 L1 词汇";
+      return;
+    }
+
+    const item = currentWords[currentIndex];
+    const mode = modeSelect.value;
+
+    if (mode === "en-zh") {
+      frontWord.textContent = item.word || "";
+      frontPhonetic.textContent = item.phonetic || "暂无音标";
+      frontHint.textContent = "点击卡片查看中文意思";
+      backMeaning.textContent = item.meaning || "暂无中文意思";
+      backWord.textContent = "";
+      backPhonetic.textContent = "";
+      backHint.textContent = "点击卡片返回英文";
+    } else {
+      frontWord.textContent = item.meaning || "暂无中文意思";
+      frontPhonetic.textContent = "";
+      frontHint.textContent = "点击卡片查看英文";
+      backMeaning.textContent = "";
+      backWord.textContent = item.word || "";
+      backPhonetic.textContent = item.phonetic || "暂无音标";
+      backHint.textContent = "点击卡片返回中文";
+    }
+
+    backList.textContent = item.list || "";
+    progress.textContent = `第 ${currentIndex + 1} / ${currentWords.length} 张`;
+  }
+
+  function nextCard() {
+    if (!currentWords.length) return;
+    currentIndex = (currentIndex + 1) % currentWords.length;
+    showCard();
+  }
+
+  function previousCard() {
+    if (!currentWords.length) return;
+    currentIndex = (currentIndex - 1 + currentWords.length) % currentWords.length;
+    showCard();
+  }
+
+  listSelect.addEventListener("change", () => {
+    currentIndex = 0;
+    showCard();
+  });
+
+  modeSelect.addEventListener("change", () => {
+    currentIndex = 0;
+    showCard();
+  });
+
+  document.getElementById("shuffleButton").addEventListener("click", () => {
+    shuffleCurrentWords();
+    currentIndex = 0;
+    showCard();
+  });
+
+  document.getElementById("restartButton").addEventListener("click", () => {
+    currentIndex = 0;
+    showCard();
+  });
+
+  document.getElementById("previousButton").addEventListener("click", previousCard);
+  document.getElementById("nextButton").addEventListener("click", nextCard);
+
+  // Audio buttons stop the click from flipping the card.
+  frontAudioButton.addEventListener("click", event => {
+    event.stopPropagation();
+    const item = currentWords[currentIndex];
+    if (item) playWordAudio(item.word, frontAudioStatus);
+  });
+
+  backAudioButton.addEventListener("click", event => {
+    event.stopPropagation();
+    const item = currentWords[currentIndex];
+    if (item) playWordAudio(item.word, backAudioStatus);
+  });
+
+  flashcard.addEventListener("click", () => {
+    flashcard.classList.toggle("flipped");
+  });
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "ArrowRight") nextCard();
+    if (event.key === "ArrowLeft") previousCard();
+    if (event.key === " ") {
+      event.preventDefault();
+      flashcard.classList.toggle("flipped");
+    }
+  });
+
+  loadData();
+</script>
+</body>
+</html>
