@@ -326,16 +326,36 @@ const questionHtml = questions.map(q => {
     const audioUrl = q.item?.audioUrl || "";
 
     return `
-      <section>
+      <section
+        style="
+          border:1px solid #ddd;
+          border-radius:8px;
+          padding:14px;
+          box-sizing:border-box;
+          min-width:0;
+        "
+      >
         <b>${q.number}. ${escapeHtml(config.label)}</b>
+
         <div style="margin:12px 0">
-          <audio controls preload="none" src="${escapeHtml(audioUrl)}"></audio>
+          <audio
+            controls
+            preload="none"
+            src="${escapeHtml(audioUrl)}"
+            style="width:100%"
+          ></audio>
         </div>
+
         <input
           type="text"
           name="q${q.number}"
           autocomplete="off"
-          style="width:100%;max-width:420px;padding:10px;font-size:18px;box-sizing:border-box"
+          style="
+            width:100%;
+            padding:10px;
+            font-size:18px;
+            box-sizing:border-box;
+          "
           placeholder="请输入你听到的单词"
         >
       </section>
@@ -355,7 +375,38 @@ const questionHtml = questions.map(q => {
     </section>
   `;
 }).join("");
-  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(config.label)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}section{border:1px solid #ddd;border-radius:10px;padding:16px;margin:14px 0}button{padding:12px 22px;font-size:16px}.submit-bar{position:sticky;bottom:12px;background:#fff;border:1px solid #ccc;border-radius:10px;padding:12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:10}.submit-bar button{width:min(100%,360px);font-weight:bold}.notice{background:#eef6ff;border:1px solid #9cc8f5;padding:12px;border-radius:8px}</style></head><body><h1>TOEFL Junior List ${escapeHtml(String(questions[0]?.item?.list || ""))} · ${escapeHtml(config.label)}</h1><p>${config.count} 题，满分 100 分。</p><p class="notice">${escapeHtml(config.description)}提交前如果有未答题，系统会提示你。</p><form id="quiz"><input type="hidden" name="questions" value="${payload}">${questionHtml}<div class="submit-bar"><button type="submit">提交并评分</button></div></form><script>const form=document.getElementById('quiz');form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const questions=JSON.parse(decodeURIComponent(fd.get('questions')));const answers=questions.map(q=>fd.get('q'+q.number));const unanswered=answers.filter(a=>!a).length;if(unanswered>0){const ok=confirm('还有 '+unanswered+' 道题未作答。\\n\\n确定仍然提交吗？');if(!ok)return;}const r=await fetch('/submit-quiz?ltik=${encodeURIComponent(ltik)}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'${mode}',questions,answers})});document.body.innerHTML=await r.text();});</script></body></html>`;
+
+const spellingGridStyle = `
+  <style>
+    .spelling-grid {
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0, 1fr));
+      gap:16px;
+    }
+
+    @media (max-width:1000px) {
+      .spelling-grid {
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width:700px) {
+      .spelling-grid {
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width:450px) {
+      .spelling-grid {
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
+`;
+  return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(config.label)}</title><style>body{font-family:Arial,sans-serif;max-width:900px;margin:auto;padding:24px;line-height:1.5}section{border:1px solid #ddd;border-radius:10px;padding:16px;margin:14px 0}button{padding:12px 22px;font-size:16px}.submit-bar{position:sticky;bottom:12px;background:#fff;border:1px solid #ccc;border-radius:10px;padding:12px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.12);z-index:10}.submit-bar button{width:min(100%,360px);font-weight:bold}.notice{background:#eef6ff;border:1px solid #9cc8f5;padding:12px;border-radius:8px}</style></head><body><h1>TOEFL Junior List ${escapeHtml(String(questions[0]?.item?.list || ""))} · ${escapeHtml(config.label)}</h1><p>${config.count} 题，满分 100 分。</p><p class="notice">${escapeHtml(config.description)}提交前如果有未答题，系统会提示你。</p><form id="quiz"><input type="hidden" name="questions" value="${payload}">${mode === "spelling"
+  ? spellingGridStyle + `<div class="spelling-grid">${questionHtml}</div>`
+  : questionHtml}<div class="submit-bar"><button type="submit">提交并评分</button></div></form><script>const form=document.getElementById('quiz');form.addEventListener('submit',async e=>{e.preventDefault();const fd=new FormData(form);const questions=JSON.parse(decodeURIComponent(fd.get('questions')));const answers=questions.map(q=>fd.get('q'+q.number));const unanswered=answers.filter(a=>!a).length;if(unanswered>0){const ok=confirm('还有 '+unanswered+' 道题未作答。\\n\\n确定仍然提交吗？');if(!ok)return;}const r=await fetch('/submit-quiz?ltik=${encodeURIComponent(ltik)}',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'${mode}',questions,answers})});document.body.innerHTML=await r.text();
+window.scrollTo({top:0, behavior:"auto"});});</script></body></html>`;
 }
 
 lti.app.use((req, res, next) => {
@@ -526,16 +577,32 @@ const right = mode === "spelling"
       </style>
     </head>
     <body>
-      <h1>测试完成</h1>
+     <h1>测试完成</h1>
 <h2>${escapeHtml(MODES[mode].label)}：${percent} / 100</h2>
 <p>
   正确：${correctCount}　
   错误：${wrongCount}　
   未作答：${unansweredCount}
 </p>
+
 <p class="success">成绩已成功提交到 Canvas Gradebook。</p>
-      <h2>答题反馈</h2>
-      ${feedback}
+
+<p style="margin:20px 0">
+  <button
+    type="button"
+    onclick="window.scrollTo({top:0, behavior:'smooth'})"
+    style="
+      padding:10px 18px;
+      font-size:16px;
+      cursor:pointer;
+    "
+  >
+    ↑ 返回顶部
+  </button>
+</p>
+
+<h2>答题反馈</h2>
+${feedback}
     </body>
   </html>
 `);
