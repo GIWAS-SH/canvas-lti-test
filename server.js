@@ -17,10 +17,6 @@ const L1_AUDIO_MAP = JSON.parse(
   fs.readFileSync(path.join(__dirname, "L1_audio_map.json"), "utf8")
 );
 
-const CANVAS_AUDIO_MAP = JSON.parse(
-  fs.readFileSync(path.join(__dirname, "canvas_audio_map.json"), "utf8")
-);
-
 lti.setup(LTI_ENCRYPTION_KEY, { url: MONGODB_URI }, {
   appRoute: "/lti/launch",
   loginRoute: "/lti/login",
@@ -72,7 +68,7 @@ function makeQuestions(mode, listNumber) {
 
   const targetList = String(listNumber || "").trim();
 
-  const listQuestions = QUESTION_BANK.filter(item => {
+  let listQuestions = QUESTION_BANK.filter(item => {
     const itemList = String(item.list || "").trim();
 
     return (
@@ -87,14 +83,15 @@ function makeQuestions(mode, listNumber) {
   }
 
   if (mode === "context") {
-    const missingContext = listQuestions.filter(item => {
-      return !item.contextBlank || !item.correctAnswer;
+    // 语境题只从已有完整语境数据的单词中抽取。
+    // 没有 contextBlank / correctAnswer 的词直接忽略，
+    // 不影响该 List 的其他题型。
+    listQuestions = listQuestions.filter(item => {
+      return item.contextBlank && item.correctAnswer;
     });
 
-    if (missingContext.length > 0) {
-      throw new Error(
-        `List ${targetList} 还有 ${missingContext.length} 个单词缺少语境题数据。`
-      );
+    if (listQuestions.length === 0) {
+      throw new Error(`List ${targetList} 没有可用的语境题数据。`);
     }
   }
 
@@ -118,12 +115,7 @@ if (mode === "spelling") {
   return selected.map((item, index) => {
   
  if (mode === "spelling") {
-  const wordKey = String(item.word || "").trim().toLowerCase();
-  const listKey = String(parseListNumber(item.list));
-
-  const audio =
-    CANVAS_AUDIO_MAP.lists?.[listKey]?.[wordKey] ||
-    (listKey === "1" ? L1_AUDIO_MAP[wordKey] : null);
+  const audio = L1_AUDIO_MAP[String(item.word || "").trim().toLowerCase()];
 
   return {
     number: index + 1,
