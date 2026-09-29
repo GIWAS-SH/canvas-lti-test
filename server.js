@@ -17,6 +17,10 @@ const L1_AUDIO_MAP = JSON.parse(
   fs.readFileSync(path.join(__dirname, "L1_audio_map.json"), "utf8")
 );
 
+const CANVAS_AUDIO_MAP = JSON.parse(
+  fs.readFileSync(path.join(__dirname, "canvas_audio_map.json"), "utf8")
+);
+
 lti.setup(LTI_ENCRYPTION_KEY, { url: MONGODB_URI }, {
   appRoute: "/lti/launch",
   loginRoute: "/lti/login",
@@ -114,7 +118,12 @@ if (mode === "spelling") {
   return selected.map((item, index) => {
   
  if (mode === "spelling") {
-  const audio = L1_AUDIO_MAP[String(item.word || "").trim().toLowerCase()];
+  const wordKey = String(item.word || "").trim().toLowerCase();
+  const listKey = String(parseListNumber(item.list));
+
+  const audio =
+    CANVAS_AUDIO_MAP.lists?.[listKey]?.[wordKey] ||
+    (listKey === "1" ? L1_AUDIO_MAP[wordKey] : null);
 
   return {
     number: index + 1,
