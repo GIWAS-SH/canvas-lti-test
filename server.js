@@ -482,7 +482,9 @@ lti.app.get("/audio/l1/:fileId", async (req, res) => {
         .status(response.status)
         .send(`Canvas audio request failed: ${response.status}`);
     }
-
+res.setHeader("Access-Control-Allow-Origin", "https://giwas-sh.github.io");
+res.setHeader("Vary", "Origin");
+    
     res.setHeader(
       "Content-Type",
       response.headers.get("content-type") || "audio/mpeg"
